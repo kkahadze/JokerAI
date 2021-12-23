@@ -280,7 +280,6 @@ def main():
 
         def play_round(self):
             self.deck = StandardJokerDeck()
-            self.deal_to_users()
             self.set_random_calls()
             self.playing_phase()
             self.reset_users()
@@ -290,3 +289,37 @@ def main():
 
         def get_card_choice(self, player):
             random.randint(0, len(self.users[player].cards))
+
+    class simulation(object):
+        def __init__(self):
+            self.places = []
+            self.dealt = []
+            self.wild = []
+            self.num_wild = []
+            self.num_joks = []
+            self.already_called = []
+            self.correct = []
+            self.called = []
+        
+        def run(self):
+            game = Game()
+            for i in range(0, 24): # 24 plays a game
+                game.update_round()
+                game.deal_to_users()
+                for j in range(1,5):
+                    id = (self.dealer + j) % 4
+                    self.num_wild.append(len(filter(lambda x: x.suit == game.get_wilsuit() and x.value != 13, list(game.users[id].cards))))
+                    self.num_joks.append(len(filter(lambda x: x.value == 13, list(game.users[id].cards))))
+                
+                game.play_round()
+                for j in range(1,5):
+                    id = (self.dealer + j) % 4
+                    adder = 0
+                    for k in range(1, j):
+                        adder += game.users[id + k - 1].called
+                    self.places.append(j)
+                    self.dealt.append(game.cards_dealt)
+                    self.wild.append(game.get_wildsuit() != 4)
+                    self.already_called += adder
+                    self.correct.append(self.users[id].called == self.users[id].taken)
+                    self.called.append(self.users[id].called)
