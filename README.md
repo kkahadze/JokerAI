@@ -14,7 +14,7 @@ $ python3 joker.py game
 ```
 ## Running Simulations
 If you would like to run simulations of Joker games in order to train your own Joker AI, you can run as many as you like and store them in a csv by running:
-the following while inside the /src directory
+the following while inside the src directory
 ```
 $ python3 joker.py simulation 100
 ```
