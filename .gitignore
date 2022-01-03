@@ -1,1 +1,10 @@
-**/.DS_Store
+.DS_Store
+.AppleDouble
+.LSOverride
+
+/.vscode
+/.ipynb_checkpoints
+/__pycache__
+ModelBuilder.ipynb
+joker_simulations.csv
+test_units.py
