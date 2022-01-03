@@ -36,3 +36,5 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 ## Further Development
 To make the AI even better, I plan to replace the hueristic that actually picks the cards to play for the AI, with a machine learned model to improve card choices.
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
