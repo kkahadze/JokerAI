@@ -1,5 +1,4 @@
 # JokerAI
-## Introduction 
 This is an implementation of the Joker card game in Python. I created this in order to be able to play against a smart Joker AI that has the potential to beat
 human players.
 ## What is Joker?
