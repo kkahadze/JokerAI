@@ -30,10 +30,11 @@ rewrite the game in Python, and use my knowledge of ML to create a ML model for 
 1,000 full joker games, consisting of 144,000 total hands and extracting relevant that the AI had before choosing their call.I trained this AI myself and pickled 
 it to be loaded in at the beginning of the game. 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+Pull requests are welcome.
 ## Further Development
 To make the AI even better, I plan to replace the hueristic that actually picks the cards to play for the AI, with a machine learned model to improve card choices.
+## Dependencies
+- Numpy
+- Scikit-Learn
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
