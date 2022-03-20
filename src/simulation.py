@@ -1,4 +1,4 @@
-from joker_game import Game
+from game import Game
 import csv
 class Simulation(object):
     def __init__(self):

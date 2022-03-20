@@ -1,10 +1,12 @@
-from joker_game import Game
-from joker_simulation import Simulation
+from game import Game
+from simulation import Simulation as sm
 import sys
+
 class Joker():
     def main():
+        # Simulation
         if sys.argv[1] == 'simulation':
-            simulation = Simulation()
+            simulation = sm()
             if int(sys.argv[2]) > 0:
                 if len(sys.argv) > 3 and sys.argv[3] == 'NOMODEL':
                     simulation.run(int(sys.argv[2]), False)
@@ -18,6 +20,8 @@ class Joker():
                     simulation.run(10, True)
             simulation.write_to_csv()
             print("Success! The results of the " + ('10' if int(sys.argv[2]) <= 0 else sys.argv[2]) + " simulations has been recorded in joker_simulations.csv")
+        
+        # Game
         elif sys.argv[1] == 'game':
             game = Game()
             game.run()

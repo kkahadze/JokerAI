@@ -5,7 +5,8 @@ import sys
 import time
 import pickle
 from sklearn.neighbors import KNeighborsClassifier
-from joker_display import Display
+from display import Display as dp
+
 class Card(object):
     def __init__(self, value, suit):
         self.value = value
@@ -220,19 +221,19 @@ class Game(object):
     def playing_phase(self):
         starter = (self.dealer + 1) % 4
         if not self.simulation:
-            Display.wild(self.get_wildsuit())
+            dp.wild(self.get_wildsuit())
 
         for i in range(self.cards_dealt):
             if not self.simulation:
-                Display.cards_in_hand(self.users[0].cards)
+                dp.cards_in_hand(self.users[0].cards)
             played = []
             for j in range(0, 4):
                 player = (starter + j) % 4
                 choices = self.playable(player, self.get_wildsuit(), self.first_suit)
                 if not self.simulation and player == 0:
                     choices = self.playable(player, self.get_wildsuit(), self.first_suit)
-                    Display.playable(choices)
-                    choice = choices[Display.ask_card_choice(len(choices))]
+                    dp.playable(choices)
+                    choice = choices[dp.ask_card_choice(len(choices))]
                 else:
                     choice = self.get_card_choice(player, played, starter)
                 self.users[player].cards.remove(choice)
@@ -241,7 +242,7 @@ class Game(object):
                     self.first_suit = choice.suit
                 
                 if not self.simulation:
-                    Display.cards(played)
+                    dp.cards(played)
                     time.sleep(.5)
             
             # using slicing to left rotate by 3
@@ -250,7 +251,7 @@ class Game(object):
             starter = self.compute_winner(played) # The winner of the hand becomes the starter of the next hand
             self.users[starter].taken += 1
             if not self.simulation:
-                Display.winner_of_hand(self, starter)
+                dp.winner_of_hand(self, starter)
                 time.sleep(1)
             self.first_suit = None
         for i in range(4):
@@ -290,10 +291,7 @@ class Game(object):
         self.set_calls(calls[0],calls[1],calls[2],calls[3])
 
     def get_random_call(self, already):
-        cap = 0
-#         if self.cards_dealt > MAX: #########################################################
-#             cap = MAX
-#         else:
+        # Cap can be set to only record hands with little cards
         cap = self.cards_dealt
         rand = random.randint(0, cap)
         if already != None:
@@ -306,9 +304,9 @@ class Game(object):
         for i in range(1,4):
             player = (self.dealer + i) % 4
             if ((not self.simulation) and player == 0):
-                Display.wild(self.get_wildsuit())
-                Display.cards_in_hand(self.users[player].cards)
-                call = Display.ask_call(self.cards_dealt)
+                dp.wild(self.get_wildsuit())
+                dp.cards_in_hand(self.users[player].cards)
+                call = dp.ask_call(self.cards_dealt)
             else:
                 if self.get_wildsuit() == 4 : 
                     wild = 0 
@@ -341,7 +339,7 @@ class Game(object):
             self.set_predicted_calls(self.model)
         self.playing_phase()
         if not self.simulation:
-            Display.scores(self)
+            dp.scores(self)
 
     def get_wild_choice(self):
         return 0
