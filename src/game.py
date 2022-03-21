@@ -82,7 +82,7 @@ class Player(object):
         id = self.id
         return id
 
-class Game(object):
+class Game(object): # Non simulated game currently uses model every time
     def __init__(self):
         self.deck = StandardJokerDeck()
         self.wildcard = Card(0,0)
@@ -92,7 +92,6 @@ class Game(object):
         self.play = 0
         self.users = [Player(0), Player(1), Player(2), Player(3)]
         self.dealer = random.randint(0, 3)
-        self.simulation = False
         self.model = None
 
     def get_place_in_playing_order(self, player_id):
@@ -220,17 +219,15 @@ class Game(object):
 
     def playing_phase(self):
         starter = (self.dealer + 1) % 4
-        if not self.simulation:
-            dp.wild(self.get_wildsuit())
+        dp.wild(self.get_wildsuit())
 
         for i in range(self.cards_dealt):
-            if not self.simulation:
-                dp.cards_in_hand(self.users[0].cards)
+            dp.cards_in_hand(self.users[0].cards)
             played = []
             for j in range(0, 4):
                 player = (starter + j) % 4
                 choices = self.playable(player, self.get_wildsuit(), self.first_suit)
-                if not self.simulation and player == 0:
+                if player == 0:
                     choices = self.playable(player, self.get_wildsuit(), self.first_suit)
                     dp.playable(choices)
                     choice = choices[dp.ask_card_choice(len(choices))]
@@ -240,20 +237,18 @@ class Game(object):
                 played.append(choice)
                 if j == 0:
                     self.first_suit = choice.suit
-                
-                if not self.simulation:
-                    dp.cards(played)
-                    time.sleep(.5)
+                dp.cards(played)
+                time.sleep(.5)
             
             # using slicing to left rotate by 3
             played = played[(4 - starter):] + played[:(4 - starter)] # Rotates the array of played cards in order to index it by player id
 
             starter = self.compute_winner(played) # The winner of the hand becomes the starter of the next hand
             self.users[starter].taken += 1
-            if not self.simulation:
-                dp.winner_of_hand(self, starter)
-                time.sleep(1)
+            dp.winner_of_hand(self, starter)
+            time.sleep(1)
             self.first_suit = None
+
         for i in range(4):
             self.users[i].score += self.get_player_score(i)
 
@@ -275,7 +270,6 @@ class Game(object):
             return taken * 100
         else:
             return (taken * 50 + 50)
-
 
     def set_random_calls(self):
         calls = []
@@ -301,9 +295,9 @@ class Game(object):
     
     def set_predicted_calls(self, model):
         calls = [0] * 4
-        for i in range(1,4):
+        for i in range(1,4): # Should this be 0 - 4?
             player = (self.dealer + i) % 4
-            if ((not self.simulation) and player == 0):
+            if (player == 0):
                 dp.wild(self.get_wildsuit())
                 dp.cards_in_hand(self.users[player].cards)
                 call = dp.ask_call(self.cards_dealt)
@@ -338,8 +332,7 @@ class Game(object):
         else:
             self.set_predicted_calls(self.model)
         self.playing_phase()
-        if not self.simulation:
-            dp.scores(self)
+        dp.scores(self)
 
     def get_wild_choice(self):
         return 0
@@ -400,10 +393,7 @@ class Game(object):
             if beatable and aggressive:
                 return self.get_strongest(cards)
             else:
-                return self.get_weakest(cards)
-                
-
-        
+                return self.get_weakest(cards) 
 
     def load_model(self):
         filename = 'finalized_model.sav'
