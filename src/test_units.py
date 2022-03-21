@@ -1,4 +1,5 @@
-from game import Game, StandardJokerDeck, Player, Card
+from game import Game
+from objects import Deck, Player, Card
 from display import Display
 from simulation import Simulation
 import unittest   # The test framework
@@ -31,7 +32,7 @@ class Test_Units(unittest.TestCase):
         assert repr(cards[3]) == "King of Spades"
     
     def test_create_deck(self):
-        deck = StandardJokerDeck()
+        deck = Deck()
         assert len(list(filter(lambda x: x.value == 4, deck))) == 2
         assert len(list(filter(lambda x: x.value == 13, deck))) == 2
         assert len(list(filter(lambda x: x.suit == 0 and x.value != 13, deck))) == 9
@@ -40,7 +41,7 @@ class Test_Units(unittest.TestCase):
         assert len(list(filter(lambda x: x.suit == 3 and x.value != 13, deck))) == 8
     
     def test_shuffle(self):
-        deck = StandardJokerDeck()
+        deck = Deck()
         old = deck.copy()
         deck.shuffle()
         assert (deck != old)

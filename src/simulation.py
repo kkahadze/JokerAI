@@ -1,5 +1,6 @@
 import csv
 import random
+import datetime
 import numpy as np
 import csv
 import sys
@@ -8,7 +9,7 @@ import pickle
 
 from sklearn.neighbors import KNeighborsClassifier
 from display import Display as dp
-from game import Player, Card, StandardJokerDeck
+from objects import Player, Card, Deck
 
 
 class Simulation(object):
@@ -72,7 +73,7 @@ class Simulation(object):
 
 class SimulatedGame(object):
     def __init__(self, model):
-        self.deck = StandardJokerDeck()
+        self.deck = Deck()
         self.wildcard, self.first_suit = Card(0,0),  Card(0,5)
         self.cards_dealt, self.round, self.play = 0, 0, 0
         self.users = [Player(0), Player(1), Player(2), Player(3)]
@@ -144,6 +145,7 @@ class SimulatedGame(object):
             None
 
     def deal_to_users(self):
+        random.seed(datetime.now())
         random.shuffle(self.deck)
         for i in range(4):
             self.deck.deal(self.users[i], self.cards_dealt)
@@ -294,7 +296,7 @@ class SimulatedGame(object):
         return mp[0]
 
     def play_round(self):
-        self.deck = StandardJokerDeck()
+        self.deck = Deck()
         if self.model == None:
             self.set_random_calls()
         else:

@@ -1,4 +1,5 @@
 import time
+
 class Display(object):
     def cards(cards):
         values = {
