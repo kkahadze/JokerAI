@@ -4,6 +4,6 @@
 
 /.vscode
 /.ipynb_checkpoints
-/__pycache__
+__pycache__
 ModelBuilder.ipynb
 joker_simulations.csv
