@@ -6,6 +6,7 @@ import time
 import pickle
 from sklearn.neighbors import KNeighborsClassifier
 from joker_display import Display
+
 class Card(object):
     def __init__(self, value, suit):
         self.value = value
@@ -217,44 +218,44 @@ class Game(object):
                 firsts.append(card)
             return firsts
 
-    def playing_phase(self):
-        starter = (self.dealer + 1) % 4
+def playing_phase(self):
+    starter = (self.dealer + 1) % 4
+    if not self.simulation:
+        Display.wild(self.get_wildsuit())
+
+    for i in range(self.cards_dealt):
         if not self.simulation:
-            Display.wild(self.get_wildsuit())
-
-        for i in range(self.cards_dealt):
-            if not self.simulation:
-                Display.cards_in_hand(self.users[0].cards)
-            played = []
-            for j in range(0, 4):
-                player = (starter + j) % 4
+            Display.cards_in_hand(self.users[0].cards)
+        played = []
+        for j in range(0, 4):
+            player = (starter + j) % 4
+            choices = self.playable(player, self.get_wildsuit(), self.first_suit)
+            if not self.simulation and player == 0:
                 choices = self.playable(player, self.get_wildsuit(), self.first_suit)
-                if not self.simulation and player == 0:
-                    choices = self.playable(player, self.get_wildsuit(), self.first_suit)
-                    Display.playable(choices)
-                    choice = choices[Display.ask_card_choice(len(choices))]
-                else:
-                    choice = self.get_card_choice(player, played, starter)
-                self.users[player].cards.remove(choice)
-                played.append(choice)
-                if j == 0:
-                    self.first_suit = choice.suit
-                
-                if not self.simulation:
-                    Display.cards(played)
-                    time.sleep(.5)
+                Display.playable(choices)
+                choice = choices[Display.ask_card_choice(len(choices))]
+            else:
+                choice = self.get_card_choice(player, played, starter)
+            self.users[player].cards.remove(choice)
+            played.append(choice)
+            if j == 0:
+                self.first_suit = choice.suit
             
-            # using slicing to left rotate by 3
-            played = played[(4 - starter):] + played[:(4 - starter)] # Rotates the array of played cards in order to index it by player id
-
-            starter = self.compute_winner(played) # The winner of the hand becomes the starter of the next hand
-            self.users[starter].taken += 1
             if not self.simulation:
-                Display.winner_of_hand(self, starter)
-                time.sleep(1)
-            self.first_suit = None
-        for i in range(4):
-            self.users[i].score += self.get_player_score(i)
+                Display.cards(played)
+                time.sleep(.5)
+        
+        # using slicing to left rotate by 3
+        played = played[(4 - starter):] + played[:(4 - starter)] # Rotates the array of played cards in order to index it by player id
+
+        starter = self.compute_winner(played) # The winner of the hand becomes the starter of the next hand
+        self.users[starter].taken += 1
+        if not self.simulation:
+            Display.winner_of_hand(self, starter)
+            time.sleep(1)
+        self.first_suit = None
+    for i in range(4):
+        self.users[i].score += self.get_player_score(i)
 
     def reset_users(self):
         for user in self.users:
@@ -291,9 +292,6 @@ class Game(object):
 
     def get_random_call(self, already):
         cap = 0
-#         if self.cards_dealt > MAX: #########################################################
-#             cap = MAX
-#         else:
         cap = self.cards_dealt
         rand = random.randint(0, cap)
         if already != None:
@@ -388,7 +386,7 @@ class Game(object):
             for card in played: # Determine if the cards currently played are beatable
                 if card.suit == self.get_wildsuit():
                     contains_wild = True
-                    if (len(list(filter(lambda x: x.suit == self.get_wildsuit() and card.value > card.value, cards))) == 0):
+                    if (len(list(filter(lambda x: x.suit == self.get_wildsuit() and card.value > card.value, cards))) == 0): # major issue?
                         beatable = False
                     
             if not contains_wild:
@@ -413,7 +411,7 @@ class Game(object):
         self.model = pickle.load(file)
         file.close()
 
-    def run(self):
+    def run(self): # shouldny this be self?
         game = Game()
         game.load_model()
         for i in range(0, 24): # 24 plays a game
