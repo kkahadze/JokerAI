@@ -29,8 +29,6 @@ This version of the game needed 4 people to play and was limited by not being ab
 rewrite the game in Python, and use my knowledge of ML to create a ML model for predicting "calls" in the game. I trained the model by running a simulation of 
 1,000 full joker games, consisting of 144,000 total hands and extracting relevant that the AI had before choosing their call.I trained this AI myself and pickled 
 it to be loaded in at the beginning of the game. 
-## Contributing
-Pull requests are welcome.
 ## Further Development
 To make the AI even better, I plan to replace the hueristic that actually picks the cards to play for the AI, with a machine learned model to improve card choices.
 ## Dependencies
