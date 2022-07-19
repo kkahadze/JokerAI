@@ -34,5 +34,3 @@ To make the AI even better, I plan to replace the hueristic that actually picks 
 ## Dependencies
 - Numpy
 - Scikit-Learn
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
