@@ -7,3 +7,5 @@
 __pycache__
 ModelBuilder.ipynb
 joker_simulations.csv
+.pytest_cache
+.vscode

@@ -1,5 +1,4 @@
-import pytest
-from jokerai.card import Card
+from jokerai.src.card import Card
 
 def test_card_rank():
     assert Card(15, 0).rank() == 9
