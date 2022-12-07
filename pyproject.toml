@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jokerai"
+version = "0.0.1"
+authors = [
+  { name="Konstantine Kahadze", email="konstantinekahadze@gmail.com" },
+]
+description = "A joker agent"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
