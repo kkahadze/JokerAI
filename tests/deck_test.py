@@ -10,3 +10,11 @@ def test_deck_init():
 def test_deck_shuffle():
     assert Deck().shuffle() != Deck()
 
+def test_deck_deal():
+    deck = Deck()
+    pile = []
+    deck.deal(pile) 
+    assert len(deck) == 35
+    deck.deal(pile) 
+    assert len(deck) == 34
+    assert len(pile) == 2

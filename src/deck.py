@@ -29,8 +29,8 @@ class Deck(list):
         return self[index]
 
     def deal(self, location, times=1):
-        for i in range(times):
-            location.cards.append(self.burn())
+        for _ in range(times):
+            location.append(self.burn())
 
     def burn(self):
         return self.pop(0)
