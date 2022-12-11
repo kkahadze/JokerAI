@@ -44,6 +44,12 @@ class Card(object):
         Returns True if the card is the same suit as the other card.
         '''
         return self.suit == other.suit
+    
+    def is_suit(self, suit):
+        '''
+        Returns True if the card is the same suit as "suit".
+        '''
+        return self.suit == suit
 
     def __lt__ (self, other):
         return self.rank() < other.rank()
@@ -68,31 +74,3 @@ class Card(object):
     
     def __str__(self):
         return self.__repr__()  
-# class StandardJokerDeck(list):
-#     def __init__(self):
-#         super().__init__()
-#         suits = list(range(4))
-#         values = list(range(5, 13))
-#         # Ranks 7 through A are added
-#         [[self.append(Card(i, j)) for j in suits] for i in values]
-#         # Ranks Six and Ace are added
-#         self.extend([Card(13, 0), Card(13, 0), Card(4, 0), Card(4, 2)]) 
-
-#     def __repr__(self):
-#         out = ""
-#         for card in self:
-#             out += (str(card) + "\n")
-#         return out
-
-#     def shuffle(self):
-#         random.shuffle(self)
-
-#     def get(self, index):
-#         return self[index]
-
-#     def deal(self, location, times=1):
-#         for i in range(times):
-#             location.cards.append(self.burn())
-
-#     def burn(self):
-#         return self.pop(0)

@@ -8,7 +8,7 @@ version = "0.0.1"
 authors = [
   { name="Konstantine Kahadze", email="konstantinekahadze@gmail.com" },
 ]
-description = "A joker agent"
+description = "A Joker framework"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [

@@ -1,4 +1,4 @@
-from jokerai.src.card import Card
+from src.card import Card
 
 def test_card_rank():
     assert Card(15, 0).rank() == 9
