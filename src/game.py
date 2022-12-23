@@ -1,11 +1,9 @@
 import random
 import numpy as np
-import csv
-import sys
 import time
 import pickle
 from sklearn.neighbors import KNeighborsClassifier
-from joker_display import Display
+from display import Display
 
 class Card(object):
     def __init__(self, value, suit):

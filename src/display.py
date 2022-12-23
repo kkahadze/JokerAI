@@ -1,4 +1,3 @@
-import time
 class Display(object):
     def cards(cards):
         values = {
@@ -195,8 +194,10 @@ class Display(object):
 
     def get_top_of_10():
         return "    |  10            |"
+        
     def get_bottom_of_10():
         return "    |            10  |"
+
     def wild(suit):
         suits = {
             0: lambda : "♦",
@@ -205,6 +206,7 @@ class Display(object):
             3: lambda : "♠",
         }
         print("\nWildsuit: ", suits[suit]() if suit < 4 else "✖")
+
     def cards_in_hand(cards):
         print("Currently, you have the following cards in hand: \n", cards)
     
@@ -239,6 +241,7 @@ class Display(object):
             else:
                 print("Please enter a valid value: ")
         return choice
+
     def winner_of_hand(game, player):
         if player == 0:
             print("You have won this hand. You have taken a total of " + str(game.users[player].taken) + " cards.")
