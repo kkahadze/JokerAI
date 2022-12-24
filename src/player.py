@@ -1,21 +1,20 @@
-
-class Player(int):
-    def __init__(number, hand_in=[]):
-        self = number
+class Player():
+    def __init__(self, number_in, hand_in =[]):
+        self.number = number_in
         self.hand = hand_in
         self.score = 0
 
     def __repr__(self):
-        return "Player " + str(self)
+        return "Player " + str(self.number)
 
-    def get_right(self):
-        return (self + 1) % 4
+    def right(self) -> int:
+        return (self.number + 1) % 4
 
-    def get_left(self):
-        return (self - 1) % 4
+    def left(self) -> int:
+        return (self.number - 1) % 4
 
-    def get_across(self):
-        return (self + 2) % 4
+    def across(self) -> int:
+        return (self.number + 2) % 4
     
     def update_score(self, desired: int, actual: int, dealt: int):
         if desired == actual: 

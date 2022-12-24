@@ -10,8 +10,9 @@ class JokerEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 # all can be any card or no card (meaning that the current player is the first to play)
-                "in_play": spaces.MultiDiscrete([37, 37, 37]), 
+                "in_play": spaces.MultiDiscrete([37, 37, 37]), # 0-36, 36 = no card
                 "wild_suit": spaces.Discrete(4),
+                # "wild_value": spaces.Discrete(10), # 0-9
                 "players": spaces.Dict(
                     {
                         "0": spaces.Dict(
@@ -43,7 +44,11 @@ class JokerEnv(gym.Env):
                         
                     }
                 ),
+                # "jokers_remaining": spaces.Discrete(3), # 0-2
                 # "gone": spaces.MultiBinary(36)
+                # "scores": spaces.MultiDiscrete([10, 10, 10, 10]),
+                # others scores (who does it benefit to hurt)
+                # premia 
             }
         )
 
@@ -60,7 +65,3 @@ class JokerEnv(gym.Env):
         # KING:     28        29      30        31
         # ACE:      32        33      34        35
         self.action_space = spaces.Discrete(36)
-
-        
-
-
