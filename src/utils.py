@@ -126,3 +126,26 @@ def garunteed_win_with_jok(observation):
 
 def beatable_obs(observation):
     return False
+
+def choose_how_to_play_joker(observation):
+    '''
+    Returns the best way to play the joker given the current observation, 
+    0 - 3 = ვიში/Highest (Diamonds to Spades), 
+    4-7 = წაიღოს/Take (Diamonds to Spades), 
+    8 = Play Default
+    9 = Play Under
+    '''
+
+    # Variables that the optimal play of a Joker depends on
+
+    if first_to_play(observation):
+        if want_to_win(observation):
+            return 4 + choose_suit_for_highest()
+        else:
+            return choose_suit_for_take()
+    else: # second, third or fourth to play
+        if want_to_win(observation):
+            return 8
+        else:
+            return 9
+    
