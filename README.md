@@ -5,5 +5,3 @@ Joker is a card game commonly played in the country of Georgia and by some in Ru
 online on sites like [this](https://www.jok.ge). Joker is a card game played between four people in which each player must "call" how many hands they think they 
 will take at the beginning of each set after a certain amount of cards are dealt to each user. After, each player must battle it out to see who can take the 
 amount that they predicted they would. A more detailed description of the Joker card game can be found [here](https://www.pagat.com/exact/joker.html).
-## Why Joker?
-Aside from growing up and spending hours playing the card game in person my journey with the Joker game began when I implemented a version of the [Joker game in Rust](https://github.com/kkahadze/Joker-In-Rust). 
