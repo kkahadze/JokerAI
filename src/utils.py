@@ -56,6 +56,18 @@ def least_common_suit_in_hand(observation: OrderedDict) -> int:
     elif spades <= diamonds and spades <= clubs and spades <= hearts:
         return 3
 
+def most_common_suit_in_hand(observation: OrderedDict) -> int:
+    diamonds, clubs, hearts, spades = suit_count(observation['players']['0']['hand'])
+
+    if diamonds >= clubs and diamonds >= hearts and diamonds >= spades:
+        return 0
+    elif clubs >= diamonds and clubs >= hearts and clubs >= spades:
+        return 1
+    elif hearts >= diamonds and hearts >= clubs and hearts >= spades:
+        return 2
+    elif spades >= diamonds and spades >= clubs and spades >= hearts:
+        return 3
+
 def wildsuit_count(observation: OrderedDict) -> int:
     wildsuit = observation['wild_suit']
     return suit_count(observation['players']['0']['hand'])[wildsuit]
@@ -96,6 +108,8 @@ def choose_suit_for_take(observation):
     '''
     more_wanted = additional_hands_desired(observation)
     wildsuits_in_hand = wildsuit_count(observation)
+
+    return most_common_suit_in_hand(observation)
 
     if more_wanted:
         return False

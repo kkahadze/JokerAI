@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand
 from src.card import Card
 
 def test_card_to_int():
@@ -52,6 +52,9 @@ def test_least_common_suit_in_hand():
     obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
     assert least_common_suit_in_hand(obs) == 2
 
+def test_most_common_suit_in_hand():
+    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
+    assert most_common_suit_in_hand(obs) == 1
 def test_wilsuit_count():
     obs = {"players": {"0": {"hand": map(
         lambda x: card_to_int(x), 
