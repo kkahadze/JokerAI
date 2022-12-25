@@ -1,4 +1,4 @@
-from src.utils import suit_count, least_common_suit_in_hand, wildsuit_count
+from src.utils import first_to_play, want_to_win, choose_suit_for_highest, choose_suit_for_take
 
 class RuleBasedAgent():
     def __init__(self, env):
@@ -40,3 +40,4 @@ class RuleBasedAgent():
                 return 8
             else:
                 return 9
+        

@@ -130,6 +130,18 @@ def test_garunteed_win_with_jok():
     }
     assert not garunteed_win_with_jok(obs)
 
-
-
-
+def test_how_to_play_joker():
+    obs = {
+        "in_play": [13, 3, 36],
+        "jokers_remaining": 1,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        }
+    }

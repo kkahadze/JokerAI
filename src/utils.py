@@ -1,5 +1,6 @@
 from src.card import Card
 from collections import OrderedDict
+import random
 
 def additional_hands_desired(observation):
     return observation['players']['0']['desired'] - observation['players']['0']['taken']
@@ -104,15 +105,13 @@ def choose_suit_for_highest(observation: OrderedDict) -> int:
 
 def choose_suit_for_take(observation):
     '''
-    This should also eventually be learned. For now, this is based on
+    This should also eventually be learned, or better yet completely based on what cards have gone.
     '''
-    more_wanted = additional_hands_desired(observation)
-    wildsuits_in_hand = wildsuit_count(observation)
-
-    return most_common_suit_in_hand(observation)
-
-    if more_wanted:
-        return False
+    common_count = suit_count(most_common_suit_in_hand(observation))
+    if common_count > 1 and common_count < 5:
+        return most_common_suit_in_hand(observation)
+    else:
+        return random.randint(0, 3)
 
 def garunteed_win_with_jok(observation):
     '''
