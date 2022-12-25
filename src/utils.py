@@ -1,4 +1,5 @@
 from src.card import Card
+from collections import OrderedDict
 
 def card_to_int(card: Card) -> int:
     if card.value == 6:
@@ -17,23 +18,23 @@ def suit_count(cards) -> tuple:
     for card in cards:
         if card > 33:
             continue
-        if card == 0:
+        elif card == 0:
             diamonds += 1
         elif card == 1:
             hearts += 1
-        elif card % 4 == 0:
+        elif (card - 2) % 4 == 0:
             diamonds += 1
-        elif card % 4 == 1:
+        elif (card - 2) % 4 == 1:
             clubs += 1
-        elif card % 4 == 2:
+        elif (card - 2) % 4 == 2:
             hearts += 1
-        elif card % 4 == 3:
+        elif (card - 2) % 4 == 3:
             spades += 1
     
     return diamonds, clubs, hearts, spades
 
-def least_common_suit_in_hand(observation) -> int:
-    diamonds, clubs, hearts, spades = suit_count(observation.player[0].cards)
+def least_common_suit_in_hand(observation: OrderedDict) -> int:
+    diamonds, clubs, hearts, spades = suit_count(observation['players']['0']['hand'])
 
     if diamonds <= clubs and diamonds <= hearts and diamonds <= spades:
         return 0
@@ -44,15 +45,14 @@ def least_common_suit_in_hand(observation) -> int:
     elif spades <= diamonds and spades <= clubs and spades <= hearts:
         return 3
 
-def wildsuit_count(observation) -> int:
-    wildsuit = observation.wild_suit
-    return suit_count(observation)[wildsuit]
-
+def wildsuit_count(observation: OrderedDict) -> int:
+    wildsuit = observation['wild_suit']
+    return suit_count(observation['players']['0']['hand'])[wildsuit]
 
 def int_to_card(card: int) -> Card:
     return Card(card % 9 + 6, card // 9)
 
-def want_to_win(observation):
+def want_to_win(observation: OrderedDict):
     '''
     This should eventually be learned by our model but a rule based approach will do for now.
     This rule based approach returns True if the player wants to win, and False if they want to take
@@ -62,13 +62,13 @@ def want_to_win(observation):
     else:
         return False
 
-def first_to_play(observation):
+def first_to_play(observation: OrderedDict) -> bool:
     if observation.in_play[0] == 36:
         return True
     else:
         return False
 
-def choose_suit_for_highest(observation):
+def choose_suit_for_highest(observation: OrderedDict) -> int:
     '''
     This should also eventually be learned, for now, the choice of suit is based on the amount of hands that the player wants,
     as well as the amount of wildcards in their hand.
