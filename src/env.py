@@ -44,7 +44,7 @@ class JokerEnv(gym.Env):
                         
                     }
                 ),
-                # "jokers_remaining": spaces.Discrete(3), # 0-2
+                "jokers_remaining": spaces.Discrete(3), # 0-2
                 # "gone": spaces.MultiBinary(36)
                 # "scores": spaces.MultiDiscrete([10, 10, 10, 10]),
                 # others scores (who does it benefit to hurt)

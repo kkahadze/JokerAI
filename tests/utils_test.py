@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok
 from src.card import Card
 
 def test_card_to_int():
@@ -101,3 +101,32 @@ def test_want_to_win():
 def test_first_to_play():
     obs = {"in_play": [36, 36, 36]}
     assert first_to_play(obs)
+
+def test_garunteed_win_with_jok():
+    obs = {
+        "in_play": [13, 3, 36],
+        "jokers_remaining": 1
+        }
+    assert garunteed_win_with_jok(obs)
+
+    obs = {
+        "in_play": [13, 3, 36],
+        "jokers_remaining": 0
+    }
+    assert not garunteed_win_with_jok(obs)
+
+    obs = {
+        "in_play": [13, 3, 1],
+        "jokers_remaining": 1,
+    }
+    assert garunteed_win_with_jok(obs)
+    
+    obs = {
+        "in_play": [13, 3, 36],
+        "jokers_remaining": 2,
+    }
+    assert not garunteed_win_with_jok(obs)
+
+
+
+

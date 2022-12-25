@@ -1,6 +1,9 @@
 from src.card import Card
 from collections import OrderedDict
 
+def additional_hands_desired(observation):
+    return observation['players']['0']['desired'] - observation['players']['0']['taken']
+
 def card_to_int(card: Card) -> int:
     if card.value == 6:
         return card.suit // 2 # 0 if Diamonds, 1 if Heart
@@ -79,7 +82,7 @@ def choose_suit_for_highest(observation: OrderedDict) -> int:
     as well as the amount of wildcards in their hand.
     '''
 
-    more_wanted = additional_hands_desired(observation.players[0].desired - observation.players[0].taken)
+    more_wanted = additional_hands_desired(observation)
     wildsuits_in_hand = wildsuit_count(observation)
 
     if more_wanted > 1 and wildsuits_in_hand <= more_wanted + 1:
@@ -91,5 +94,22 @@ def choose_suit_for_take(observation):
     '''
     This should also eventually be learned. For now, this is based on
     '''
-    if want_to_win(observation):
-        return least_common_suit_in_hand(observation)
+    more_wanted = additional_hands_desired(observation)
+    wildsuits_in_hand = wildsuit_count(observation)
+
+    if more_wanted:
+        return False
+
+def garunteed_win_with_jok(observation):
+    '''
+    Returns True if a player can garunteed by playing a joker
+    '''
+    if observation["in_play"][-1] != 36:
+        return True
+    elif observation["jokers_remaining"] == 1:
+        return True
+    else:
+        return False
+
+def beatable_obs(observation):
+    return False
