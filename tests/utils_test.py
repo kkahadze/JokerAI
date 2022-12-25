@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play
 from src.card import Card
 
 def test_card_to_int():
@@ -19,6 +19,25 @@ def test_card_to_int():
 
     card = Card(11, 1)
     assert card_to_int(card) == 19
+
+def test_int_to_card():
+    card = int_to_card(0)
+    assert card.value == 6 and card.suit == 0
+
+    card = int_to_card(1)
+    assert card.value == 6 and card.suit == 2
+
+    card = int_to_card(2)
+    assert card.value == 7 and card.suit == 0
+
+    card = int_to_card(34)
+    assert card.value == 14 and card.suit == 0
+
+    card = int_to_card(35)
+    assert card.value == 14 and card.suit == 1
+
+    card = int_to_card(19)
+    assert card.value == 11 and card.suit == 1
 
 def test_suit_count():
     hand = [Card(6, 0), Card(10, 3), Card(11, 1)]
@@ -48,6 +67,37 @@ def test_wilsuit_count():
         }
     assert wildsuit_count(obs) == 3
 
+def test_want_to_win():
+    obs = {
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x), 
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        },
+        "wild_suit": 1
+    }
+    assert want_to_win(obs)
 
-
+    obs = {
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x), 
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 2,
+                "taken": 2,
+            }
+        },
+        "wild_suit": 1
+    }
+    assert not want_to_win(obs)
     
+def test_first_to_play():
+    obs = {"in_play": [36, 36, 36]}
+    assert first_to_play(obs)

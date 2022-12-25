@@ -9,6 +9,14 @@ def card_to_int(card: Card) -> int:
     else:
         return (card.value - 7) * 4 + (card.suit) + 2
 
+def int_to_card(card_index: int) -> Card:
+    if card_index < 2:
+        return Card(6, card_index * 2)
+    elif card_index == 34 or card_index == 35:
+        return Card(14, card_index - 34)
+    else:
+        return Card((card_index - 2) // 4 + 7, (card_index - 2) % 4)
+
 def suit_count(cards) -> tuple:
     diamonds = 0
     clubs = 0
@@ -49,21 +57,18 @@ def wildsuit_count(observation: OrderedDict) -> int:
     wildsuit = observation['wild_suit']
     return suit_count(observation['players']['0']['hand'])[wildsuit]
 
-def int_to_card(card: int) -> Card:
-    return Card(card % 9 + 6, card // 9)
-
 def want_to_win(observation: OrderedDict):
     '''
     This should eventually be learned by our model but a rule based approach will do for now.
     This rule based approach returns True if the player wants to win, and False if they want to take
     '''
-    if observation.players[0].desired != observation.players[0].taken:
+    if observation['players']['0']['desired'] != observation['players']['0']['taken']:
         return True
     else:
         return False
 
 def first_to_play(observation: OrderedDict) -> bool:
-    if observation.in_play[0] == 36:
+    if observation['in_play'][0] == 36:
         return True
     else:
         return False
