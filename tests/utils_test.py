@@ -146,3 +146,41 @@ def test_choose_how_to_play_joker():
         }
     }
     assert choose_how_to_play_joker(obs) == 8
+
+    obs = {
+        "in_play": [36, 36, 36],
+        "jokers_remaining": 2,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 1), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        },
+        "wild_suit": 1
+    }
+
+    assert choose_how_to_play_joker(obs) == 5
+
+    obs = {
+        "in_play": [36, 36, 36],
+        "jokers_remaining": 2,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 3), Card(10, 3), Card(11, 2), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 4), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 0,
+                "taken": 0
+                ,
+            }
+        },
+        "wild_suit": 1
+    }
+
+    assert choose_how_to_play_joker(obs) == 1
+

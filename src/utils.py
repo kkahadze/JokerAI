@@ -99,7 +99,7 @@ def choose_suit_for_highest(observation: OrderedDict) -> int:
     wildsuits_in_hand = wildsuit_count(observation)
 
     if more_wanted > 1 and wildsuits_in_hand <= more_wanted + 1:
-        return observation.wild_suit
+        return observation['wild_suit']
     elif more_wanted == 0:
         return least_common_suit_in_hand(observation)
 
@@ -107,7 +107,11 @@ def choose_suit_for_take(observation):
     '''
     This should also eventually be learned, or better yet completely based on what cards have gone.
     '''
-    common_count = suit_count(most_common_suit_in_hand(observation))
+    most_common_suit = most_common_suit_in_hand(observation)
+    diamonds, clubs, hearts, spades = suit_count(observation['players']['0']['hand'])
+    counts = [diamonds, clubs, hearts, spades]
+    common_count = counts[most_common_suit]
+
     if common_count > 1 and common_count < 5:
         return most_common_suit_in_hand(observation)
     else:
@@ -140,12 +144,22 @@ def choose_how_to_play_joker(observation):
 
     if first_to_play(observation):
         if want_to_win(observation):
-            return 4 + choose_suit_for_highest()
+            return 4 + choose_suit_for_highest(observation)
         else:
-            return choose_suit_for_take()
+            return choose_suit_for_take(observation)
     else: # second, third or fourth to play
         if want_to_win(observation):
             return 8
         else:
             return 9
     
+def playable(observation): # needs testing
+    hand = observation["players"]["0"]["hand"]
+    if cards_in_hand(observation) == 1:
+        return [hand[0]]
+    else:
+        return None
+        
+def cards_in_hand(observation): # needs testting
+    hand = observation["players"]["0"]["hand"]
+    return 9 - [card == 36 for card in hand].count(True)

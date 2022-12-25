@@ -1,4 +1,4 @@
-from src.utils import first_to_play, want_to_win, choose_suit_for_highest, choose_suit_for_take
+from src.utils import first_to_play, want_to_win, choose_suit_for_highest, choose_suit_for_take, playable
 
 class RuleBasedAgent():
     def __init__(self, env):
@@ -20,4 +20,9 @@ class RuleBasedAgent():
         unimplemented()
 
     def choose_card(self, observation):
-        unimplemented()
+        playable = playable(observation)
+
+        if len(playable) == 1:
+            return playable[0]
+        else:
+            hand = observation["players"]["0"]["hand"]        
