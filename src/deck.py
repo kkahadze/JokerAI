@@ -8,7 +8,7 @@ class Deck(list):
         # Ranks 7 through A are added
         super().__init__([Card(i, j) for j in suits for i in values])
         # Ranks Six and Ace are added
-        self.extend([Card(15, 0), Card(15, 0), Card(6, 0), Card(6, 2)]) 
+        self.extend([Card(15, 0), Card(15, 1), Card(6, 0), Card(6, 2)]) 
         self.shuffle()
     
     def ordered_deck(self):

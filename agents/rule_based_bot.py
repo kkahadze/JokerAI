@@ -1,3 +1,4 @@
+from src.utils import suit_count, least_common_suit_in_hand, wildsuit_count
 
 class RuleBasedAgent():
     def __init__(self, env):
@@ -39,25 +40,3 @@ class RuleBasedAgent():
                 return 8
             else:
                 return 9
-
-def want_to_win(observation):
-    # This should eventually be learned by our model but a rule based approach will do for now
-    if observation.players[0].desired != observation.players[0].taken:
-        return True
-    else:
-        return False
-
-def first_to_play(observation):
-    if observation.in_play[0] == 36:
-        return True
-    else:
-        return False
-
-def choose_suit_for_highest(observation):
-    # This should also eventually be learned, for now, the choice of suit is based on 
-
-    if additional_hands_desired > 1 and wildcards_in_hand <= additional_hands_desired + 1:
-        return 
-    
-def get_wildsuit(observation):
-    return observation.wild_suit

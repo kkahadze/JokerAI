@@ -18,3 +18,6 @@ def test_deck_deal():
     deck.deal(pile) 
     assert len(deck) == 34
     assert len(pile) == 2
+
+
+print(Deck())
