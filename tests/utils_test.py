@@ -326,8 +326,6 @@ def test_playable():
     }
 
     cur_playable = playable(obs)
-    print("CUR_PLAYABLE:" + str(cur_playable))
-    print("SHOULD BE: " + str([Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]))
     assert cur_playable == [Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]
 
     for _ in range(10):
