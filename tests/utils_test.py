@@ -330,8 +330,13 @@ def test_playable():
     print("SHOULD BE: " + str([Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]))
     assert cur_playable == [Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]
 
-    env = JokerEnv()
-    assert playable(env.observation_space.sample())
+    for _ in range(10):
+        env = JokerEnv()
+        assert playable(env.observation_space.sample())
+        obs = env.observation_space.sample()
+        sample_hand = obs['players']['0']['hand'] # for printing the hand
+        cur_playable = playable(obs)
+        assert cur_playable
 
 def test_contains_suit():
     assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])

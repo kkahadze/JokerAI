@@ -223,7 +223,7 @@ def truncate_at_first_none(cards: list):
             return cards[:i]
     return cards
 
-def playable(observation): # Returns a list of cards that can be played, account for jokers
+def playable(observation): # Returns a list of cards that can be played, accounting for jokers
     hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
 
     print('Hand Before Filter: ' + str(hand))
@@ -332,7 +332,8 @@ def have_wild_suit(observation):
     print(f"Player cards: {player_cards}")
     wildsuit_cards = list(filter(lambda card_int: card_int == wildsuit, player_cards))
     print(f"Wildsuit cards: {wildsuit_cards}")
-    truncated_wilds = truncate_at_first_none(wildsuit_cards)
-    print(f"Truncated wilds: {truncated_wilds}")
+    truncated_wild_ints = truncate_at_first_none(wildsuit_cards)
+    print(f"Truncated wilds: {truncated_wild_ints}")
+    truncated_wilds = list(map(lambda card_int: int_to_card(card_int), truncated_wild_ints))
     return contains_suit(wildsuit, truncated_wilds)
-
+    
