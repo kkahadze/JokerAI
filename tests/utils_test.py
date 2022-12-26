@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit, first_suit_exists, first_suit_index, playable, contains_suit
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit_with_joks, first_suit_exists, first_suit_index, playable, contains_suit
 from src.card import Card
 
 def test_card_to_int():
@@ -11,10 +11,10 @@ def test_card_to_int():
     card = Card(7, 0)
     assert card_to_int(card) == 2
 
-    card = Card(14, 0)
+    card = Card(15, 0)
     assert card_to_int(card) == 34
 
-    card = Card(14, 1)
+    card = Card(15, 1)
     assert card_to_int(card) == 35
 
     card = Card(11, 1)
@@ -31,10 +31,10 @@ def test_int_to_card():
     assert card.value == 7 and card.suit == 0
 
     card = int_to_card(34)
-    assert card.value == 14 and card.suit == 0
+    assert card.value == 15 and card.suit == 0
 
     card = int_to_card(35)
-    assert card.value == 14 and card.suit == 1
+    assert card.value == 15 and card.suit == 1
 
     card = int_to_card(19)
     assert card.value == 11 and card.suit == 1
@@ -44,28 +44,28 @@ def test_suit_count():
     mapped_hand = map(lambda x : card_to_int(x), hand)
     assert suit_count(mapped_hand) == (1, 1, 0, 1)
 
-    hand = [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
+    hand = [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
     mapped_hand = map(lambda x : card_to_int(x), hand)
     assert suit_count(mapped_hand) == (2, 3, 0, 2)
 
 def test_least_common_suit_in_hand():
-    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
+    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
     assert least_common_suit_in_hand(obs) == 2
 
 def test_most_common_suit_in_hand():
-    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
+    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
     assert most_common_suit_in_hand(obs) == 1
 def test_wilsuit_count():
     obs = {"players": {"0": {"hand": map(
         lambda x: card_to_int(x), 
-        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}},
+        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}},
         "wild_suit": 2
         }
     assert wildsuit_count(obs) == 0
 
     obs = {"players": {"0": {"hand": map(
         lambda x: card_to_int(x), 
-        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}},
+        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}},
         "wild_suit": 1
         }
     assert wildsuit_count(obs) == 3
@@ -76,7 +76,7 @@ def test_want_to_win():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x), 
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 4,
                 "taken": 0
@@ -91,7 +91,7 @@ def test_want_to_win():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x), 
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 2,
                 "taken": 2,
@@ -138,7 +138,7 @@ def test_choose_how_to_play_joker():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 4,
                 "taken": 0
@@ -154,7 +154,7 @@ def test_choose_how_to_play_joker():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x),
-                    list([Card(6, 1), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 1), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 4,
                 "taken": 0
@@ -172,7 +172,7 @@ def test_choose_how_to_play_joker():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x),
-                    list([Card(6, 3), Card(10, 3), Card(11, 2), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 4), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 3), Card(10, 3), Card(11, 2), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 4), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 0,
                 "taken": 0
@@ -199,7 +199,7 @@ def test_obs_to_string():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 4,
                 "taken": 0
@@ -221,7 +221,7 @@ def test_obs_to_string():
         
     }
 
-    assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Ace of Clubs, Ace of Diamonds, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
+    assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Joker, Joker, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
     
 
 def test_cards_in_hand():
@@ -230,7 +230,7 @@ def test_cards_in_hand():
             "0": {
                 "hand": map(
                     lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
                 "desired": 4,
                 "taken": 0
@@ -246,10 +246,10 @@ def test_int_to_suit():
     assert int_to_suit(3) == "Spades"
     assert int_to_suit(4) == "No Wild Suit"
 
-def test_filter_by_suit():
-    cards = [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
-    filtered = filter_by_suit(cards, 1)
-    assert filtered == [Card(11, 1), Card(10, 1), Card(7, 1)]
+def test_filter_by_suit_with_joks():
+    cards = [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
+    filtered = filter_by_suit_with_joks(cards, 1)
+    assert filtered == [Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1)]
 
 def test_first_suit_exists():
     obs = {
@@ -290,48 +290,49 @@ def test_first_suit_index():
     assert first_suit_index(obs) == 1
 
 def test_playable():
-    obs = {
-        "in_play": [36, 36, 36],
-        "jokers_remaining": 2,
-        "players": {
-            "0": {
-                "hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-                "desired": 4,
-                "taken": 0
-            }
-        },
-        "wild_suit": 1
-    }
+    # obs = {
+    #     "in_play": [36, 36, 36],
+    #     "jokers_remaining": 2,
+    #     "players": {
+    #         "0": {
+    #             "hand": map(
+    #                 lambda x: card_to_int(x),
+    #                 list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+    #             ),
+    #             "desired": 4,
+    #             "taken": 0
+    #         }
+    #     },
+    #     "wild_suit": 1
+    # }
 
-    assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
+    # assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
 
     obs = {
         "in_play": [1, 36, 36],
         "jokers_remaining": 2,
         "players": {
             "0": {
-                "hand": map(
+                "hand": list(map(
                     lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
+                    list([Card(6, 0), Card(10, 2), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 2), Card(11, 0)])
+                )),
                 "desired": 4,
                 "taken": 0
             }
         },
-        "wild_suit": 0
+        "wild_suit": 2
     }
-    print(playable(obs))
-    print([Card(10, 3), Card(15, 1), Card(15, 0), Card(8, 3)])
 
-    assert playable(obs) == [Card(10, 3), Card(15, 1), Card(15, 0), Card(8, 3)]
+    cur_playable = playable(obs)
+    print("CUR_PLAYABLE:" + str(cur_playable))
+    print("SHOULD BE: " + str([Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]))
+    assert cur_playable == [Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]
 
-
-
+    # env = JokerEnv()
+    # assert playable(env.observation_space.sample())
 
 def test_contains_suit():
-    assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-    assert not contains_suit(2, [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+    assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+    assert not contains_suit(2, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
 

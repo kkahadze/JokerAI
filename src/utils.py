@@ -226,33 +226,57 @@ def truncate_at_first_none(cards: list):
 def playable(observation): # Returns a list of cards that can be played, account for jokers
     hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
 
+    print('Hand Before Filter: ' + str(hand))
+
     if cards_in_hand(observation) == 1:
+        print("Only one card left in hand")
         return [hand[0]]
     else:
         if first_to_play(observation):
+            print("First to play")
             return hand
         else:
             if first_suit_exists(observation):
                 if has_first_suit(observation):
-                    return filter_by_suit(hand, first_suit_index(observation))
+                    print("Has first suit")
+                    return filter_by_suit_with_joks(hand, first_suit_index(observation))
                 else:
-                    if wildsuit_exists(observation):
-                        return filter_by_suit(hand, get_wildsuit(observation))
-                    else:
+                    print("Don't have first suit")
+                    if not wildsuit_exists(observation):
+                        print("No wildsuit")
                         return hand
-            elif wildsuit_exists(observation):
-                if have_wild_suit(observation):
-                    return filter_by_suit(hand, get_wildsuit(observation))
-                else:
-                    return hand
-            else:
+                    else:
+                        print("Wildsuit exists")
+                        print(f"Wildsuit: {int_to_suit(get_wildsuit(observation))}")
+                        if not have_wild_suit(observation):
+                            print("Don't have wildsuit")
+                            return hand
+                        else:
+                            print("Have wildsuit")
+                            return filter_by_suit_with_joks(hand, get_wildsuit(observation))
+            elif not wildsuit_exists(observation):
+                print("No wildsuit")
                 return hand
+            else:
+                print("Wildsuit exists")
+                if not have_wild_suit(observation):
+                    print("Don't have wildsuit")
+                    return hand
+                else:
+                    print("Have wildsuit")
+                    return filter_by_suit_with_joks(hand, get_wildsuit(observation))
 
-def filter_by_suit(cards: list, suit: str):
+def filter_by_suit_with_joks(cards: list, suit: str):
+    '''
+    Filters the cards inputted to only include cards of the given suit and jokers
+    '''
+    return list(filter(lambda card: card.suit == suit or card.value == 15, cards))
+
+def filter_by_suit_without_joks(cards: list, suit: str):
     '''
     Filters the cards inputted to only include cards of the given suit
     '''
-    return list(filter(lambda card: card.suit == suit and card.value != 15, cards))
+    return list(filter(lambda card: card.suit == suit, cards))
 
 def first_suit_exists(observation):
     '''
@@ -302,5 +326,13 @@ def have_wild_suit(observation):
     '''
     Returns True if Player 0's hand contains the wildsuit
     '''
-    return contains_suit(get_wildsuit(observation), truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"]))))
+    wildsuit = get_wildsuit(observation)
+    print(f"HAVEWILDSUIT: Wildsuit: {wildsuit}")
+    player_cards = observation["players"]["0"]["hand"]
+    print(f"Player cards: {player_cards}")
+    wildsuit_cards = list(filter(lambda card_int: card_int == wildsuit, player_cards))
+    print(f"Wildsuit cards: {wildsuit_cards}")
+    truncated_wilds = truncate_at_first_none(wildsuit_cards)
+    print(f"Truncated wilds: {truncated_wilds}")
+    return contains_suit(wildsuit, truncated_wilds)
 
