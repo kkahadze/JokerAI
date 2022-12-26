@@ -290,23 +290,23 @@ def test_first_suit_index():
     assert first_suit_index(obs) == 1
 
 def test_playable():
-    # obs = {
-    #     "in_play": [36, 36, 36],
-    #     "jokers_remaining": 2,
-    #     "players": {
-    #         "0": {
-    #             "hand": map(
-    #                 lambda x: card_to_int(x),
-    #                 list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-    #             ),
-    #             "desired": 4,
-    #             "taken": 0
-    #         }
-    #     },
-    #     "wild_suit": 1
-    # }
+    obs = {
+        "in_play": [36, 36, 36],
+        "jokers_remaining": 2,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        },
+        "wild_suit": 1
+    }
 
-    # assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
+    assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
 
     obs = {
         "in_play": [1, 36, 36],
