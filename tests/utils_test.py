@@ -182,5 +182,4 @@ def test_choose_how_to_play_joker():
         "wild_suit": 1
     }
 
-    assert choose_how_to_play_joker(obs) == 1
-
+    assert choose_how_to_play_joker(obs)

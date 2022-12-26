@@ -65,3 +65,12 @@ class JokerEnv(gym.Env):
         # KING:     28        29      30        31
         # ACE:      32        33      34        35
         self.action_space = spaces.Discrete(36)
+
+
+    def step(self, action):
+        # Execute one time step within the environment
+        pass
+
+    def reset(self):
+        # Reset the state of the environment to an initial state
+        pass

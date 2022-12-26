@@ -14,12 +14,24 @@ def card_to_int(card: Card) -> int:
         return (card.value - 7) * 4 + (card.suit) + 2
 
 def int_to_card(card_index: int) -> Card:
-    if card_index < 2:
+    if card_index == 36:
+        return None
+    elif card_index < 2:
         return Card(6, card_index * 2)
     elif card_index == 34 or card_index == 35:
         return Card(14, card_index - 34)
     else:
         return Card((card_index - 2) // 4 + 7, (card_index - 2) % 4)
+
+def int_to_suit(suit_index: int) -> str:
+    if suit_index == 0:
+        return 'Diamonds'
+    elif suit_index == 1:
+        return 'Clubs'
+    elif suit_index == 2:
+        return 'Hearts'
+    elif suit_index == 3:
+        return 'Spades'
 
 def suit_count(cards) -> tuple:
     diamonds = 0
@@ -163,3 +175,32 @@ def playable(observation): # needs testing
 def cards_in_hand(observation): # needs testting
     hand = observation["players"]["0"]["hand"]
     return 9 - [card == 36 for card in hand].count(True)
+
+def obs_to_string(observation):
+    obs_string = ""
+
+    card_ints = observation["in_play"]
+    wildsuit = observation["wild_suit"]
+    hand0, desired0, taken0 = observation["players"]["0"]["hand"], observation["players"]["0"]["desired"], observation["players"]["0"]["taken"]
+    desired1, taken1 = observation["players"]["1"]["desired"], observation["players"]["1"]["taken"]
+    desired2, taken2 = observation["players"]["2"]["desired"], observation["players"]["2"]["taken"]
+    desired3, taken3 = observation["players"]["3"]["desired"], observation["players"]["3"]["taken"]
+    jokers_remaining = observation["jokers_remaining"]
+
+    cards = list(map(lambda card_int: int_to_card(card_int), card_ints))
+    cards = truncate_at_first_none(cards)
+    
+    obs_string += "Cards Played: " + str(cards) + "\n"
+    obs_string += str(int_to_suit(wildsuit)) + "\n"
+
+def print_obs(observation):
+    print(obs_to_string(observation))
+    
+def truncate_at_first_none(cards: list):
+    '''
+    Truncates a list of cards at the first None, else returns the entire list if no None is found
+    '''
+    for i, card in enumerate(cards):
+        if card == None:
+            return cards[:i]
+    return cards
