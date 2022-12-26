@@ -3,6 +3,17 @@ class Player():
         self.number = number_in
         self.hand = hand_in
         self.score = 0
+        self.wanted = -1
+        self.taken = 0
+
+    def set_taken(self, taken):
+        self.taken = taken
+
+    def add_take(self):
+        self.taken += 1
+
+    def set_wanted(self, wanted):
+        self.wanted = wanted
 
     def __repr__(self):
         return "Player " + str(self.number)

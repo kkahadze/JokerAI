@@ -2,8 +2,6 @@ from src.card import Card
 from collections import OrderedDict
 import random
 
-from src.env import JokerEnv
-
 def additional_hands_desired(observation):
     return observation['players']['0']['desired'] - observation['players']['0']['taken']
 

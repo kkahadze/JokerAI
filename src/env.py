@@ -1,6 +1,7 @@
 import gym
 from gym import spaces
-import numpy as np
+
+from src.game import Game
 
 class JokerEnv(gym.Env):
     metadata = {}
@@ -76,7 +77,7 @@ class JokerEnv(gym.Env):
         self.game = JokerGame()
         self.observation_space['in_play'] = [36, 36, 36]
         self.observation_space['wild_suit'] = 4
-        
+
         self.observation_space['players']['0']['hand'] = self.game.players[0].hand
         self.observation_space['players']['0']['desired'] = self.game.players[0].desired
         self.observation_space['players']['0']['taken'] = self.game.players[0].taken

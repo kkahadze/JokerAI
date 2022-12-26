@@ -26,6 +26,6 @@ class RuleBasedAgent():
             return playable[0]
         else:
             hand = observation["players"]["0"]["hand"]
-
+            
             
                     
