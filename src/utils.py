@@ -2,6 +2,8 @@ from src.card import Card
 from collections import OrderedDict
 import random
 
+from src.env import JokerEnv
+
 def additional_hands_desired(observation):
     return observation['players']['0']['desired'] - observation['players']['0']['taken']
 
@@ -181,7 +183,7 @@ def obs_to_string(observation):
 
     card_ints = observation["in_play"]
     wildsuit = observation["wild_suit"]
-    hand0, desired0, taken0 = observation["players"]["0"]["hand"], observation["players"]["0"]["desired"], observation["players"]["0"]["taken"]
+    hand0_ints, desired0, taken0 = observation["players"]["0"]["hand"], observation["players"]["0"]["desired"], observation["players"]["0"]["taken"]
     desired1, taken1 = observation["players"]["1"]["desired"], observation["players"]["1"]["taken"]
     desired2, taken2 = observation["players"]["2"]["desired"], observation["players"]["2"]["taken"]
     desired3, taken3 = observation["players"]["3"]["desired"], observation["players"]["3"]["taken"]
@@ -191,7 +193,26 @@ def obs_to_string(observation):
     cards = truncate_at_first_none(cards)
     
     obs_string += "Cards Played: " + str(cards) + "\n"
-    obs_string += str(int_to_suit(wildsuit)) + "\n"
+    obs_string += "Wildsuit" + str(int_to_suit(wildsuit)) + "\n"
+    
+    hand0 = list(map(lambda card_int: int_to_card(card_int), hand0_ints))
+    hand0 = truncate_at_first_none(hand0)
+
+    obs_string += "Hand: " + str(hand0) + "\n"
+    obs_string += "Desired: " + str(desired0) + "\n"
+    obs_string += "Taken: " + str(taken0) + "\n"
+
+    obs_string += "Opponent 1 Desired: " + str(desired1) + "\n"
+    obs_string += "Opponent 1 Taken: " + str(taken1) + "\n"
+
+    obs_string += "Opponent 2 Desired: " + str(desired2) + "\n"
+    obs_string += "Opponent 2 Taken: " + str(taken2) + "\n"
+
+    obs_string += "Opponent 3 Desired: " + str(desired3) + "\n"
+    obs_string += "Opponent 3 Taken: " + str(taken3) + "\n"
+
+    obs_string += "Jokers Remaining: " + str(jokers_remaining) + "\n"
+
 
 def print_obs(observation):
     print(obs_to_string(observation))
@@ -204,3 +225,7 @@ def truncate_at_first_none(cards: list):
         if card == None:
             return cards[:i]
     return cards
+
+env = JokerEnv()
+print_obs(env.observation_space.sample())
+

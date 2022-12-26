@@ -183,3 +183,5 @@ def test_choose_how_to_play_joker():
     }
 
     assert choose_how_to_play_joker(obs)
+
+

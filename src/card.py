@@ -58,10 +58,16 @@ class Card(object):
         return self.rank() > other.rank()
 
     def __eq__ (self, other):
-        return self.rank() == other.rank() and self.suit == other.suit
+        if isinstance(other, Card):
+            return self.rank() == other.rank() and self.suit == other.suit
+        else:
+            return False
 
     def __ne__ (self, other):
-        return self.rank() != other.rank()
+        if isinstance(other, Card):
+            return self.rank() != other.rank() or self.suit != other.suit
+        else:
+            return True
 
     def __le__ (self, other):     
         return self.rank() <= other.rank()  
