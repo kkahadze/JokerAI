@@ -11,7 +11,7 @@ class JokerEnv(gym.Env):
             {
                 # all can be any card or no card (meaning that the current player is the first to play)
                 "in_play": spaces.MultiDiscrete([37, 37, 37]), # 0-36, 36 = no card
-                "wild_suit": spaces.Discrete(4),
+                "wild_suit": spaces.Discrete(5), # 0-4, 4 = no wild suit
                 # "wild_value": spaces.Discrete(10), # 0-9
                 "players": spaces.Dict(
                     {

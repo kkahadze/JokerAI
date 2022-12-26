@@ -34,6 +34,8 @@ def int_to_suit(suit_index: int) -> str:
         return 'Hearts'
     elif suit_index == 3:
         return 'Spades'
+    elif suit_index == 4:
+        return 'No Wild Suit'
 
 def suit_count(cards) -> tuple:
     diamonds = 0
@@ -166,15 +168,8 @@ def choose_how_to_play_joker(observation):
             return 8
         else:
             return 9
-    
-def playable(observation): # needs testing
-    hand = observation["players"]["0"]["hand"]
-    if cards_in_hand(observation) == 1:
-        return [hand[0]]
-    else:
-        return None
         
-def cards_in_hand(observation): # needs testting
+def cards_in_hand(observation):
     hand = observation["players"]["0"]["hand"]
     return 9 - [card == 36 for card in hand].count(True)
 
@@ -193,7 +188,7 @@ def obs_to_string(observation):
     cards = truncate_at_first_none(cards)
     
     obs_string += "Cards Played: " + str(cards) + "\n"
-    obs_string += "Wildsuit" + str(int_to_suit(wildsuit)) + "\n"
+    obs_string += "Wildsuit: " + str(int_to_suit(wildsuit)) + "\n"
     
     hand0 = list(map(lambda card_int: int_to_card(card_int), hand0_ints))
     hand0 = truncate_at_first_none(hand0)
@@ -213,6 +208,8 @@ def obs_to_string(observation):
 
     obs_string += "Jokers Remaining: " + str(jokers_remaining) + "\n"
 
+    return obs_string
+
 
 def print_obs(observation):
     print(obs_to_string(observation))
@@ -226,6 +223,18 @@ def truncate_at_first_none(cards: list):
             return cards[:i]
     return cards
 
-env = JokerEnv()
-print_obs(env.observation_space.sample())
+def playable(observation): # needs testing
+    hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
 
+    if cards_in_hand(observation) == 1:
+        return [hand[0]]
+    else:
+        if first_to_play(observation):
+            return hand
+        else:
+            if first_suit_exists(observation):
+                filter_by_suit(hand, first_suit(observation))
+            elif wildsuit_exists(observation):
+                filter_by_suit(hand, wildsuit(observation))
+            else:
+                return hand

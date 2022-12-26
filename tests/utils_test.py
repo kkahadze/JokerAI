@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit
 from src.card import Card
 
 def test_card_to_int():
@@ -182,6 +182,66 @@ def test_choose_how_to_play_joker():
         "wild_suit": 1
     }
 
-    assert choose_how_to_play_joker(obs)
+    assert isinstance(choose_how_to_play_joker(obs), int)
 
+def test_truncate_at_first_none():
+    assert truncate_at_first_none([1, 2, 3, None, 4, 5]) == [1, 2, 3]
+    assert truncate_at_first_none([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]
+    assert truncate_at_first_none([1, 2, 3, None, None, 4, 5]) == [1, 2, 3]
+    assert truncate_at_first_none([1, 2, 3, None, None, None, 4, 5]) == [1, 2, 3]
+    assert truncate_at_first_none([None]) == []
 
+def test_obs_to_string():
+    obs = {
+        "in_play": [13, 3, 36],
+        "jokers_remaining": 1,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            },
+            "1": {
+                "desired": 4,
+                "taken": 0
+            },
+            "2": {
+                "desired": 4,
+                "taken": 0
+            },
+            "3": {
+                "desired": 4,
+                "taken": 0
+            }
+        },
+        "wild_suit": 1
+        
+    }
+
+    assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Ace of Clubs, Ace of Diamonds, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
+    
+
+def test_cards_in_hand():
+    obs = {
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        }
+    }
+    assert cards_in_hand(obs) == 9
+
+def test_int_to_suit():
+    assert int_to_suit(0) == "Diamonds"
+    assert int_to_suit(1) == "Clubs"
+    assert int_to_suit(2) == "Hearts"
+    assert int_to_suit(3) == "Spades"
+    assert int_to_suit(4) == "No Wild Suit"
