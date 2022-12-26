@@ -10,7 +10,7 @@ def additional_hands_desired(observation):
 def card_to_int(card: Card) -> int:
     if card.value == 6:
         return card.suit // 2 # 0 if Diamonds, 1 if Heart
-    elif card.value == 14:
+    elif card.value == 15:
         return 34 + card.suit # 34 if red, 35 if black
     else:
         return (card.value - 7) * 4 + (card.suit) + 2
@@ -21,7 +21,7 @@ def int_to_card(card_index: int) -> Card:
     elif card_index < 2:
         return Card(6, card_index * 2)
     elif card_index == 34 or card_index == 35:
-        return Card(14, card_index - 34)
+        return Card(15, card_index - 34)
     else:
         return Card((card_index - 2) // 4 + 7, (card_index - 2) % 4)
 
@@ -223,7 +223,7 @@ def truncate_at_first_none(cards: list):
             return cards[:i]
     return cards
 
-def playable(observation): # needs testing
+def playable(observation): # Returns a list of cards that can be played, account for jokers
     hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
 
     if cards_in_hand(observation) == 1:
@@ -233,8 +233,74 @@ def playable(observation): # needs testing
             return hand
         else:
             if first_suit_exists(observation):
-                filter_by_suit(hand, first_suit(observation))
+                if has_first_suit(observation):
+                    return filter_by_suit(hand, first_suit_index(observation))
+                else:
+                    if wildsuit_exists(observation):
+                        return filter_by_suit(hand, get_wildsuit(observation))
+                    else:
+                        return hand
             elif wildsuit_exists(observation):
-                filter_by_suit(hand, wildsuit(observation))
+                if have_wild_suit(observation):
+                    return filter_by_suit(hand, get_wildsuit(observation))
+                else:
+                    return hand
             else:
                 return hand
+
+def filter_by_suit(cards: list, suit: str):
+    '''
+    Filters the cards inputted to only include cards of the given suit
+    '''
+    return list(filter(lambda card: card.suit == suit and card.value != 15, cards))
+
+def first_suit_exists(observation):
+    '''
+    Returns True if the first suit exists in the current observation
+    '''
+    cards = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["in_play"])))
+    if cards:
+        return cards[0].suit
+    else:
+        return False
+
+def first_suit_index(observation):
+    '''
+    Returns the index of the first suit in the current observation
+    '''
+    cards = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["in_play"])))
+    if cards:
+        return cards[0].suit
+    else:
+        return None
+
+def wildsuit_exists(observation):
+    '''
+    Returns True if the wildsuit exists in the current observation
+    '''
+    return observation["wild_suit"] != 4
+
+def get_wildsuit(observation):
+    '''
+    Returns the wildsuit in the current observation
+    '''
+    return observation["wild_suit"]
+
+def contains_suit(suit, hand):
+    '''
+    Returns True if the hand contains the given suit
+    '''
+    return suit in list(map(lambda card: card.suit, hand))
+
+def has_first_suit(observation):
+    '''
+    Returns True if Player 0's hand contains the first suit
+    '''
+    return contains_suit(first_suit_index(observation), truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"]))))
+
+def have_wild_suit(observation):
+    '''
+    Returns True if Player 0's hand contains the wildsuit
+    '''
+    return contains_suit(get_wildsuit(observation), truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"]))))
+

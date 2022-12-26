@@ -73,4 +73,21 @@ class JokerEnv(gym.Env):
 
     def reset(self):
         # Reset the state of the environment to an initial state
-        pass
+        self.game = JokerGame()
+        self.observation_space['in_play'] = [36, 36, 36]
+        self.observation_space['wild_suit'] = 4
+        
+        self.observation_space['players']['0']['hand'] = self.game.players[0].hand
+        self.observation_space['players']['0']['desired'] = self.game.players[0].desired
+        self.observation_space['players']['0']['taken'] = self.game.players[0].taken
+
+        self.observation_space['players']['1']['desired'] = self.game.players[1].desired
+        self.observation_space['players']['1']['taken'] = self.game.players[1].taken
+
+        self.observation_space['players']['2']['desired'] = self.game.players[2].desired
+        self.observation_space['players']['2']['taken'] = self.game.players[2].taken
+
+        self.observation_space['players']['3']['desired'] = self.game.players[3].desired
+        self.observation_space['players']['3']['taken'] = self.game.players[3].taken
+
+        self.observation_space['jokers_remaining'] = 2

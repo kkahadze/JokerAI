@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit, first_suit_exists, first_suit_index, playable, contains_suit
 from src.card import Card
 
 def test_card_to_int():
@@ -245,3 +245,93 @@ def test_int_to_suit():
     assert int_to_suit(2) == "Hearts"
     assert int_to_suit(3) == "Spades"
     assert int_to_suit(4) == "No Wild Suit"
+
+def test_filter_by_suit():
+    cards = [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
+    filtered = filter_by_suit(cards, 1)
+    assert filtered == [Card(11, 1), Card(10, 1), Card(7, 1)]
+
+def test_first_suit_exists():
+    obs = {
+        "in_play": [36, 36, 36],
+    }
+    assert not first_suit_exists(obs)
+
+    obs = {
+        "in_play": [1, 36, 36],
+    }
+    assert first_suit_exists(obs)
+
+    obs = {
+        "in_play": [1, 2, 36],
+    }
+    assert first_suit_exists(obs)
+
+def test_first_suit_index():
+    obs = {
+        "in_play": [36, 36, 36],
+    }
+    assert not first_suit_index(obs)
+
+    obs = {
+        "in_play": [1, 36, 36],
+    }
+    assert first_suit_index(obs) == 2
+
+    obs = {
+        "in_play": [1, 2, 36],
+    }
+    assert first_suit_index(obs) == 2
+
+    obs = {
+        "in_play": [3, 2, 3],
+    }
+
+    assert first_suit_index(obs) == 1
+
+def test_playable():
+    obs = {
+        "in_play": [36, 36, 36],
+        "jokers_remaining": 2,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        },
+        "wild_suit": 1
+    }
+
+    assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
+
+    obs = {
+        "in_play": [1, 36, 36],
+        "jokers_remaining": 2,
+        "players": {
+            "0": {
+                "hand": map(
+                    lambda x: card_to_int(x),
+                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+                ),
+                "desired": 4,
+                "taken": 0
+            }
+        },
+        "wild_suit": 0
+    }
+    print(playable(obs))
+    print([Card(10, 3), Card(15, 1), Card(15, 0), Card(8, 3)])
+
+    assert playable(obs) == [Card(10, 3), Card(15, 1), Card(15, 0), Card(8, 3)]
+
+
+
+
+def test_contains_suit():
+    assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+    assert not contains_suit(2, [Card(6, 0), Card(10, 3), Card(11, 1), Card(14, 1), Card(14, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+

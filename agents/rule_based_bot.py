@@ -25,4 +25,7 @@ class RuleBasedAgent():
         if len(playable) == 1:
             return playable[0]
         else:
-            hand = observation["players"]["0"]["hand"]        
+            hand = observation["players"]["0"]["hand"]
+
+            
+                    
