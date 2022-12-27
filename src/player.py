@@ -37,4 +37,6 @@ class Player():
             self.score -= 200
         else: # 1 -> 10, 2 -> 20, 3 -> 30, 4 -> 40 ...
             self.score += actual * 10
-        
+
+    def take(self, cards):
+        self.hand = cards

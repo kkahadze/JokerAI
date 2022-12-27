@@ -1,28 +1,80 @@
+import random
 from src.deck import Deck
 from src.player import Player
 
 class Game:
-    def __init__(self, players_in: list = [Player(i) for i in range(4)]):
+    def __init__(self, players_in: list = [Player(i) for i in range(4)], only_nines=False):
+        if only_nines:
+            self.deal_amounts = [
+                [9, 9, 9, 9],
+                [9, 9, 9, 9],
+                [9, 9, 9, 9],
+                [9, 9, 9, 9],
+            ]
+        else:
+            self.deal_amounts = [
+                [1, 2, 3, 4, 5, 6, 7, 8],
+                [9, 9, 9, 9],
+                [8, 7, 6, 5, 4, 3, 2, 1],
+                [9, 9, 9, 9],
+            ]
+
         self.deck = Deck()
         self.players = players_in # Initializes all players (0-3) with empty hands
         self.round = 0
         self.play = 0
         self.dealer = 0
         self.wild_suit = 0
-        self.wild_value = 0 
+        # self.wild_value = 0 
         self.jokers_remaining = 2
         self.in_play = [36, 36, 36]
-        self.gone = [0 for i in range(36)]
-        # self.scores = [0 for i in range(4)]
-        # self.desired = [0 for i in range(players)]
-        # self.taken = [0 for i in range(players)]
+        # self.gone = [0 for i in range(36)]
+        
         self.done = False
         self.reward = 0
         self.info = {}
-        self.action_space = [i for i in range(37)]
-        self.observation_space = [i for i in range(37)]
-        self.action_space_n = len(self.action_space)
-        self.observation_space_n = len(self.observation_space)
+
+    def reset(self):
+        self.reset_vars()
+
+        for player_num in range(self.first_to_play, self.first_to_play + 4):
+            self.deck.deal(self.players[player_num % 4].hand, times = self.get_num_to_deal()) # player num needs to be modded to get the correct players
+            self.get_calls(player_num % 4)
+
+        player_num = self.first_to_play
+
+        while player_num % 4 != 0: # while is is not "my" turn
+            self.get_opp_play(player_num % 4)
+
+        self.done = False
+        self.reward = 0
+        self.info = {}
+        
+        return self.get_obs()
+
+    def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play
+        self.deck = Deck()
+        self.players = [Player(self.players[0].number), Player(self.players[1].number), Player(self.players[2].number), Player(self.players[3].number)]
+        self.round = 1
+        self.play = 1
+        self.first_to_play = random.randint(0, 3)
+        self.dealer = (self.first_to_play + 3) % 4
+
+        # self.wild_value = 0 
+        # self.gone = [0 for i in range(36)]
+
+
+
+    def step(self, action):
+        
+    def get_num_to_deal(self):
+        return self.deal_amounts[self.round - 1][self.play - 1]
+
+    
+
+        
+
+
 
     # def reset(self):
     #     self.deck = Deck()
