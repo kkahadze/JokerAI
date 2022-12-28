@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import int_to_card
+from src.utils import int_to_card, contains_suit
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -29,10 +29,11 @@ class Game:
         self.round = 0
         self.play = 0
         self.dealer = 0
-        self.wild_suit = 0
+        self.wild_suit = 4
         # self.wild_value = 0 
         self.jokers_remaining = 2
-        self.in_play = [36, 36, 36]
+        self.in_play = []
+
         # self.gone = [0 for i in range(36)]
 
     def reset(self):
@@ -41,7 +42,7 @@ class Game:
         for player_num in range(self.first_to_play, self.first_to_play + 4):
             self.deck.deal(self.players[player_num % 4].hand, times = self.get_num_to_deal()) # player num needs to be modded to get the correct players
         
-        calls = self.get_calls(player_num % 4)
+        calls = self.get_calls()
 
         player_num = self.first_to_play
 
@@ -49,7 +50,7 @@ class Game:
             self.ask_to_play(player_num % 4)
             player_num += 1
 
-    def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play
+    def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play and done
         self.deck = Deck()
         self.players = [self.player_types[0](self.players[0].number),
                         self.player_types[1](self.players[1].number),
@@ -59,6 +60,8 @@ class Game:
         self.play = 1
         self.first_to_play = random.randint(0, 3)
         self.dealer = (self.first_to_play + 3) % 4
+        self.wild_suit = 4
+        self.done = False
 
         # self.wild_value = 0 
         # self.gone = [0 for i in range(36)]
@@ -131,7 +134,7 @@ class Game:
             self.add_play(self.players[player_num].play(self.to_obs()))
 
     def add_play(self, play):
-        self.played.append(play)
+        self.in_play.append(play)
 
     def ask_to_play(self, player_num):
         return self.players[player_num].play(self.to_obs())
@@ -145,7 +148,29 @@ class Game:
         self.players[play_winner].add_take()
 
     def winner(self, cards):
-        return 0
+        wildsuit = self.wild_suit
+        first_suit = cards[0].suit
+
+        if wildsuit == 4: # no wildsuit
+            return self.highest_of_suit(cards, first_suit)
+        else:
+            if first_suit == wildsuit:
+                return self.highest_of_suit(cards, first_suit)
+            elif contains_suit(cards, wildsuit): # a wildsuit was playes
+                return self.highest_of_suit(cards, wildsuit)
+            else:
+                return self.highest_of_suit(cards, first_suit)
+
+    def highest_of_suit(self, cards, suit):
+        highest = 0
+        for i, card in enumerate(cards):
+            if card.suit == suit and card.value > highest:
+                highest = i
+        return cards[highest]
 
     def reset_play(self):
-        self.played = []
+        self.in_play = []
+        self.first_suit = 4
+
+    def is_done(self):
+        return self.done

@@ -1,7 +1,9 @@
+import random
 from src.player import Player
 from src.game import Game
 
 from agents.random_caller_random_player import RandomCallerRandomPlayer
+from src.utils import int_to_card, card_to_int
 
 def test_init():
     game = Game()
@@ -95,3 +97,85 @@ def test_get_calls():
     assert calls[1] >= 0 and calls[1] <=1
     assert calls[2] >= 0 and calls[2] <=1
     assert calls[3] >= 0 and calls[3] <=1
+
+def test_deal():
+    # This function tests the deal() function in game.py to assure that it deals the correct number of cards to each player
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
+    game.reset_vars()
+    game.get_calls()
+    game.deal()
+
+    assert len(game.players[0].hand) == 1
+    assert len(game.players[1].hand) == 1
+    assert len(game.players[2].hand) == 1
+    assert len(game.players[3].hand) == 1
+    
+    assert game.players[0].hand[0] != game.players[1].hand[0] and game.players[0].hand[0] != game.players[2].hand[0] and game.players[0].hand[0] != game.players[3].hand[0]
+
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
+    game.reset_vars()
+    game.get_calls()
+    game.deal()
+
+    assert len(game.players[0].hand) == 9
+    assert len(game.players[1].hand) == 9
+    assert len(game.players[2].hand) == 9
+    assert len(game.players[3].hand) == 9
+
+    assert game.players[0].hand[0] != game.players[1].hand[0] and game.players[0].hand[0] != game.players[2].hand[0] and game.players[0].hand[0] != game.players[3].hand[0]
+
+def test_reset_play():
+    # This function tests the reset_play() function in game.py to assure that it resets the played variable to an
+    #  empty list and resets the first suit
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
+    game.reset()
+    action = 1
+    card = int_to_card(action)
+    game.add_play(card_to_int(card))
+
+        
+    game.pre_plays()
+
+    if game.is_done():
+        return
+            
+    game.reset_play()
+
+    assert game.in_play == []
+    assert game.first_suit == 4
+
+def test_pre_plays():
+    # This function tests the pre_plays() function in game.py to assure that it finishes the play
+    assert True
+
+def test_add_play():
+    # This function tests the add_play() function in game.py to assure that it adds the correct card to the in_play list
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
+    game.reset()
+    game.deal()
+    action = 1
+    card = int_to_card(action)
+    game.add_play(card)
+    assert game.in_play[0] == card
+
+    game.reset()
+    game.deal()
+    card = random.choice(game.players[game.first_to_play].hand)
+    game.add_play(card)
+    assert game.in_play[0] == int_to_card(action)
+    assert game.in_play[0] not in game.players[game.first_to_play].hand
+
+def test_is_done():
+    # This function tests the is_done() function in game.py to assure that it returns True when the game is done and False when it is not
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
+    game.reset()
+    game.deal()
+    card = random.choice(game.players[game.first_to_play].hand)
+    game.add_play(card)
+    assert game.is_done() == False
+
+    game.reset()
+    game.play = 4
+    game.round = 4
+    game.update_play()
+    assert game.is_done() == True

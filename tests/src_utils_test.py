@@ -21,6 +21,12 @@ def test_card_to_int():
     card = Card(11, 1)
     assert card_to_int(card) == 19
 
+    for suit in range(0, 4):
+        for value in range(6, 15):
+            if value == 6 or value == 15:
+                continue
+            assert card_to_int(Card(value, suit)) == (value - 7) * 4 + (suit) + 2
+
 def test_int_to_card():
     card = int_to_card(0)
     assert card.value == 6 and card.suit == 0
@@ -39,6 +45,10 @@ def test_int_to_card():
 
     card = int_to_card(19)
     assert card.value == 11 and card.suit == 1
+
+    for i in range(36):
+        card = int_to_card(i)
+        assert card_to_int(card) == i
 
 def test_suit_count():
     hand = [Card(6, 0), Card(10, 3), Card(11, 1)]
@@ -331,7 +341,6 @@ def test_playable():
     for _ in range(10):
         env = JokerEnv()
         obs_space_sample = env.observation_space.sample()
-        print("obs" + str(obs_space_sample["players"]["0"]["hand"]))
         assert playable(obs_space_sample)
         obs = env.observation_space.sample()
         sample_hand = obs['players']['0']['hand'] # for printing the hand
