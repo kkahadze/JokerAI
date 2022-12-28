@@ -40,12 +40,13 @@ class Game:
 
         for player_num in range(self.first_to_play, self.first_to_play + 4):
             self.deck.deal(self.players[player_num % 4].hand, times = self.get_num_to_deal()) # player num needs to be modded to get the correct players
-            self.get_calls(player_num % 4)
+        
+        calls = self.get_calls(player_num % 4)
 
         player_num = self.first_to_play
 
         while player_num % 4 != 0: # while is is not "my" turn
-            self.get_opp_play(player_num % 4)
+            self.ask_to_play(player_num % 4)
             player_num += 1
 
     def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play
@@ -85,7 +86,7 @@ class Game:
     def pre_plays(self):
         if self.first_to_play != 1:
             for i in range(1, (self.first_to_play + 3) % 4):
-                self.opp_play(i)
+                self.ask_to_play(i)
 
     def post_plays(self):
         if self.first_to_play != 0:
@@ -103,7 +104,8 @@ class Game:
         return [self.players[player_num].call(self.to_obs()) for player_num in range(4)]
 
     def deal(self):
-        self.deck.deal(self.players[self.dealer].hand, times = self.get_num_to_deal())
+        for player_number in range(4):
+            self.deck.deal(self.players[player_number].hand, times = self.get_num_to_deal())
         self.update_play()
 
     def to_obs(self):
@@ -124,12 +126,26 @@ class Game:
 
     # calls and plays should be stored in player objects
 
-    # def get_plays(self, players):
-    #     return [self.opp_play(player_num % 4) for player_num in players] # player_num % 4 is the actual player number
+    def get_plays(self, players):
+        for player_num in players:
+            self.add_play(self.players[player_num].play(self.to_obs()))
 
-    # def set_plays(self, start, end, plays):
-    #     if start <= end:
-    #         self.plays[start:end] = plays
+    def add_play(self, play):
+        self.played.append(play)
 
-    # def opp_play(self, player_num):
-    #     self.players[player_num].play(self.to_obs())
+    def ask_to_play(self, player_num):
+        return self.players[player_num].play(self.to_obs())
+
+    def process_hand_results(self):
+        self.reset_play()
+        self.update_takes()
+
+    def update_takes(self):
+        play_winner = self.winner()
+        self.players[play_winner].add_take()
+
+    def winner(self, cards):
+        return 0
+
+    def reset_play(self):
+        self.played = []

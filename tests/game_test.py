@@ -92,7 +92,6 @@ def test_get_calls():
     calls = game.get_calls()
 
     assert calls[0] >= 0 and calls[0] <=1
-
-
-
-
+    assert calls[1] >= 0 and calls[1] <=1
+    assert calls[2] >= 0 and calls[2] <=1
+    assert calls[3] >= 0 and calls[3] <=1
