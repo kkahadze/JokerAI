@@ -1,7 +1,7 @@
 class Player():
-    def __init__(self, number_in, hand_in =[]):
+    def __init__(self, number_in):
         self.number = number_in
-        self.hand = hand_in
+        self.hand = []
         self.score = 0
         self.desired = -1
         self.taken = 0

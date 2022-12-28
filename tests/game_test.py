@@ -39,4 +39,15 @@ def test_get_num_to_deal(): # add more tests
 def test_get_calls():
     # This function tests the get_calls() function in game.py to assure that it sets the calls of each player to a valid int corresponding to
     # the type of agent
-    game = Game([Player(0), RandomCallerRandomPlayer(), RandomCallerRandomPlayer(), RandomCallerRandomPlayer()])
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
+    game.reset_vars()
+    game.get_calls()
+    for player_num in range(game.first_to_play, game.first_to_play + 4):
+        game.deck.deal(game.players[player_num % 4].hand, times = game.get_num_to_deal()) # player num needs to be modded to get the correct players
+    calls = game.get_calls()
+
+    assert calls[0] >= 0 and calls[0] <=1
+
+
+
+

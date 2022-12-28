@@ -3,11 +3,9 @@ from src.player import Player
 def test_player_init():
     player1 = Player(0)
     assert player1.number == 0
-    assert player1.hand == []
+    assert not player1.hand
     assert player1.score == 0
-
-    player2 = Player(1)
-    assert player2.number == 1
+    assert player1.desired == -1
 
 def test_player_repr():
     player1 = Player(0)

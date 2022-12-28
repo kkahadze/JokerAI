@@ -1,11 +1,14 @@
 import random
 from src.deck import Deck
 from src.player import Player
+from agents.random_caller_random_player import RandomCallerRandomPlayer
 
 from src.utils import int_to_card
 
 class Game:
-    def __init__(self, players_in: list = [Player(i) for i in range(4)], only_nines=False):
+    def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
+        self.player_types = [type(player) for player in players_in]
+
         if only_nines:
             self.deal_amounts = [
                 [9, 9, 9, 9],
@@ -49,7 +52,10 @@ class Game:
 
     def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play
         self.deck = Deck()
-        self.players = [Player(self.players[0].number), Player(self.players[1].number), Player(self.players[2].number), Player(self.players[3].number)]
+        self.players = [self.player_types[0](self.players[0].number),
+                        self.player_types[1](self.players[1].number),
+                        self.player_types[2](self.players[2].number),
+                        self.player_types[3](self.players[3].number)]
         self.round = 1
         self.play = 1
         self.first_to_play = random.randint(0, 3)
@@ -81,12 +87,12 @@ class Game:
     def pre_plays(self):
         if self.first_to_play != 1:
             for i in range(1, (self.first_to_play + 3) % 4):
-                self.get_opp_play(i)
+                self.opp_play(i)
 
     def post_plays(self):
         if self.first_to_play != 0:
-            for i in range(self.first_to_play, 4):
-                self.get_opp_play(i)
+            rest_of_players = range(self.first_to_play, 4)
+            self.get_plays(rest_of_players)
 
     def get_num_to_deal(self):
         print(f"Round {self.round}, Play {self.play}, Dealer {self.dealer}")
@@ -96,6 +102,37 @@ class Game:
         self.deal()
         self.get_calls()
 
-    def get_calls(self, player_num): # CHANGE THIS TO GET CALLS
-        # self.players[player_num].call(self.to_obs)
-        return 1
+    def get_calls(self):
+        return [self.players[player_num].call(self.to_obs()) for player_num in range(4)]
+
+    def deal(self):
+        self.deck.deal(self.players[self.dealer].hand, times = self.get_num_to_deal())
+        self.update_play()
+
+    def to_obs(self):
+        return {}
+
+    def update_play(self):
+        if self.play == len(self.deal_amounts[self.round - 1]) - 1: # if it is time to go to the next round
+            self.play = 1
+            self.round += 1
+        else:
+            self.play += 1
+        
+        if self.round == 5:
+            self.done = True
+
+    def hand_empty(self):
+        return len(self.players[0].hand) == 0
+
+    # calls and plays should be stored in player objects
+
+    # def get_plays(self, players):
+    #     return [self.opp_play(player_num % 4) for player_num in players] # player_num % 4 is the actual player number
+
+    # def set_plays(self, start, end, plays):
+    #     if start <= end:
+    #         self.plays[start:end] = plays
+
+    # def opp_play(self, player_num):
+    #     self.players[player_num].play(self.to_obs())
