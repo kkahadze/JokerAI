@@ -38,13 +38,14 @@ class Game:
 
     def reset(self):
         self.reset_vars()
-
         for player_num in range(self.first_to_play, self.first_to_play + 4):
-            self.deck.deal(self.players[player_num % 4].hand, times = self.get_num_to_deal()) # player num needs to be modded to get the correct players
+            cards_per_player = self.get_num_to_deal()
+            self.deck.deal(self.players[player_num % 4].hand, times = cards_per_player) # player num needs to be modded to get the correct players
         
         calls = self.get_calls()
 
         player_num = self.first_to_play
+
 
         while player_num % 4 != 0: # while is is not "my" turn
             self.ask_to_play(player_num % 4)
@@ -115,11 +116,15 @@ class Game:
         return {}
 
     def update_play(self):
-        if self.play == len(self.deal_amounts[self.round - 1]) - 1: # if it is time to go to the next round
+        print(f"Round: {self.round}, Play: {self.play}")
+        print(f"Length of deal ammounts for round {self.round}: {len(self.deal_amounts[self.round - 1])}")
+        if self.play == len(self.deal_amounts[self.round - 1]): # if it is time to go to the next round
             self.play = 1
             self.round += 1
         else:
             self.play += 1
+
+        print("NEW ROUND: ", self.round, self.play)
         
         if self.round == 5:
             self.done = True

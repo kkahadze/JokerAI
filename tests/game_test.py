@@ -168,14 +168,29 @@ def test_add_play():
 def test_is_done():
     # This function tests the is_done() function in game.py to assure that it returns True when the game is done and False when it is not
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
-    game.reset()
+    game.reset_vars()
     game.deal()
     card = random.choice(game.players[game.first_to_play].hand)
     game.add_play(card)
     assert game.is_done() == False
 
-    game.reset()
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
+    game.reset_vars()
     game.play = 4
     game.round = 4
     game.update_play()
     assert game.is_done() == True
+
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=False)
+    print("game.deal_amounts: ", game.deal_amounts)
+    game.reset_vars()
+    game.play = 8
+    game.round = 3
+    game.update_play()
+    assert game.is_done() == False
+
+    game.round = 4
+    game.play = 4
+    game.update_play()
+    assert game.is_done() == True
+
