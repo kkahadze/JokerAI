@@ -80,3 +80,6 @@ class Card(object):
     
     def __str__(self):
         return self.__repr__()  
+
+    def is_joker(self):
+        return self.value == 15

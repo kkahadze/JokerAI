@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit_with_joks, first_suit_exists, first_suit_index, playable, contains_suit
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit_with_joks, first_suit_exists, first_suit_index, playable, contains_suit, highest_of_suit
 from src.card import Card
 from src.env import JokerEnv
 
@@ -350,3 +350,8 @@ def test_playable():
 def test_contains_suit():
     assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
     assert not contains_suit(2, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
+
+def test_highest_of_suit():
+    assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)], 1).is_joker()
+    assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)], 2) == None
+    assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(7, 1), Card(15, 0), Card(10, 1), Card(7, 2), Card(8, 3), Card(11, 0)], 1) == Card(11, 1)

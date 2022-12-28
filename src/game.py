@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import int_to_card, contains_suit
+from src.utils import int_to_card, contains_suit, highest_of_suit
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -157,21 +157,14 @@ class Game:
         first_suit = cards[0].suit
 
         if wildsuit == 4: # no wildsuit
-            return self.highest_of_suit(cards, first_suit)
+            return highest_of_suit(cards, first_suit)
         else:
             if first_suit == wildsuit:
-                return self.highest_of_suit(cards, first_suit)
+                return highest_of_suit(cards, first_suit)
             elif contains_suit(cards, wildsuit): # a wildsuit was playes
-                return self.highest_of_suit(cards, wildsuit)
+                return highest_of_suit(cards, wildsuit)
             else:
-                return self.highest_of_suit(cards, first_suit)
-
-    def highest_of_suit(self, cards, suit):
-        highest = 0
-        for i, card in enumerate(cards):
-            if card.suit == suit and card.value > highest:
-                highest = i
-        return cards[highest]
+                return highest_of_suit(cards, first_suit)
 
     def reset_play(self):
         self.in_play = []

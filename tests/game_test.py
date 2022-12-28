@@ -182,7 +182,6 @@ def test_is_done():
     assert game.is_done() == True
 
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=False)
-    print("game.deal_amounts: ", game.deal_amounts)
     game.reset_vars()
     game.play = 8
     game.round = 3
@@ -194,3 +193,5 @@ def test_is_done():
     game.update_play()
     assert game.is_done() == True
 
+def test_highest_of_suit():
+    game = Game()

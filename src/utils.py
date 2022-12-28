@@ -315,4 +315,18 @@ def have_wild_suit(observation):
     truncated_wild_ints = truncate_at_first_none(wildsuit_cards)
     truncated_wilds = list(map(lambda card_int: int_to_card(card_int), truncated_wild_ints))
     return contains_suit(wildsuit, truncated_wilds)
+
+def highest_of_suit(cards, suit):
+    highest = 0
+    max = 0
+    for i, card in enumerate(cards):
+        if card.suit == suit and card.value > max:
+            max = card.value
+            highest = i
+    
+    if max:
+        return cards[highest]
+    else:
+        return None
+
     
