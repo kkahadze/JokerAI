@@ -16,7 +16,6 @@ class Game:
                 [9, 9, 9, 9],
                 [9, 9, 9, 9],
             ]
-            print("ONLY NINES")
         else:
             self.deal_amounts = [
                 [1, 2, 3, 4, 5, 6, 7, 8],
@@ -24,7 +23,6 @@ class Game:
                 [8, 7, 6, 5, 4, 3, 2, 1],
                 [9, 9, 9, 9],
             ]
-            print("NOT ONLY NINES")
 
         self.deck = Deck()
         self.players = players_in # Initializes all players (0-3) with empty hands
@@ -95,7 +93,6 @@ class Game:
             self.get_plays(rest_of_players)
 
     def get_num_to_deal(self):
-        print(f"Round {self.round}, Play {self.play}, Dealer {self.dealer}")
         return self.deal_amounts[self.round - 1][self.play - 1]
 
     def new_hand(self):

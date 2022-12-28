@@ -36,6 +36,51 @@ def test_get_num_to_deal(): # add more tests
     game.reset_vars()
     assert game.get_num_to_deal() == 1
 
+    game = Game()
+    game.reset_vars()
+    game.round = 2
+    assert game.get_num_to_deal() == 9
+
+    game = Game()
+    game.reset_vars()
+    game.round = 3
+    assert game.get_num_to_deal() == 8
+
+    game = Game()
+    game.reset_vars()
+    game.round = 4
+    assert game.get_num_to_deal() == 9
+
+    game = Game()
+    game.reset_vars()
+    game.round = 1
+    game.play = 5
+    assert game.get_num_to_deal() == 5
+
+    game = Game()
+    game.reset_vars()
+    game.round = 1
+    game.play = 8
+    assert game.get_num_to_deal() == 8
+
+    game = Game()
+    game.reset_vars()
+    game.round = 3
+    game.play = 8
+    assert game.get_num_to_deal() == 1
+
+    game = Game()
+    game.reset_vars()
+    game.round = 3
+    game.play = 2
+    assert game.get_num_to_deal() == 7
+
+    game = Game(only_nines=True)
+    game.reset_vars()
+    for round in range(1, 5):
+        for play in range(1, 5):
+            assert game.get_num_to_deal() == 9
+
 def test_get_calls():
     # This function tests the get_calls() function in game.py to assure that it sets the calls of each player to a valid int corresponding to
     # the type of agent

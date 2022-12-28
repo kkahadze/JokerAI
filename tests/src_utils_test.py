@@ -330,7 +330,9 @@ def test_playable():
 
     for _ in range(10):
         env = JokerEnv()
-        assert playable(env.observation_space.sample())
+        obs_space_sample = env.observation_space.sample()
+        print("obs" + str(obs_space_sample["players"]["0"]["hand"]))
+        assert playable(obs_space_sample)
         obs = env.observation_space.sample()
         sample_hand = obs['players']['0']['hand'] # for printing the hand
         cur_playable = playable(obs)
