@@ -1,6 +1,7 @@
 import random
 from src.player import Player
 from src.game import Game
+from src.card import Card
 
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 from src.utils import int_to_card, card_to_int
@@ -193,5 +194,10 @@ def test_is_done():
     game.update_play()
     assert game.is_done() == True
 
-def test_highest_of_suit():
+def test_winner():
     game = Game()
+    game.first_suit = 0
+    game.wild_suit = 1
+
+    assert game.winner([Card(6, 0), Card(7, 0), Card(6, 2), Card(7, 2)]) == 1
+

@@ -355,3 +355,5 @@ def test_highest_of_suit():
     assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)], 1).is_joker()
     assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)], 2) == None
     assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(7, 1), Card(15, 0), Card(10, 1), Card(7, 2), Card(8, 3), Card(11, 0)], 1) == Card(11, 1)
+
+
