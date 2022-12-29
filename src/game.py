@@ -38,18 +38,13 @@ class Game:
 
     def reset(self):
         self.reset_vars()
-        for player_num in range(self.first_to_play, self.first_to_play + 4):
-            cards_per_player = self.get_num_to_deal()
-            self.deck.deal(self.players[player_num % 4].hand, times = cards_per_player) # player num needs to be modded to get the correct players
-        
-        calls = self.get_calls()
+        self.deal()
+        self.get_calls()
 
         player_num = self.first_to_play
+        players_before = range(self.first_to_play, 4)
 
-
-        while player_num % 4 != 0: # while is is not "my" turn
-            self.ask_to_play(player_num % 4)
-            player_num += 1
+        self.get_plays(players_before)
 
     def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play and done
         self.deck = Deck()
@@ -62,6 +57,8 @@ class Game:
         self.first_to_play = random.randint(0, 3)
         self.dealer = (self.first_to_play + 3) % 4
         self.wild_suit = 4
+        self.first_suit = 4
+        self.in_play = []
         self.done = False
 
         # self.wild_value = 0 
@@ -73,10 +70,10 @@ class Game:
         
         self.pre_plays()
 
+        self.process_hand_results()
+
         if self.is_done():
             return
-
-        self.process_hand_results()
         
         if self.hand_empty():
             self.new_hand()
@@ -89,8 +86,8 @@ class Game:
 
     def pre_plays(self):
         if self.first_to_play != 1:
-            for i in range(1, (self.first_to_play + 3) % 4):
-                self.ask_to_play(i)
+            rest_of_players = range(1, (self.first_to_play + 3) % 4)
+            self.get_plays(rest_of_players)
 
     def post_plays(self):
         if self.first_to_play != 0:
@@ -102,30 +99,28 @@ class Game:
 
     def new_hand(self):
         self.deal()
+        self.update_play()
         self.get_calls()
 
     def get_calls(self):
-        return [self.players[player_num].call(self.to_obs()) for player_num in range(4)]
+        for player_num in range(4):
+            self.players[player_num].call(self.to_obs())
 
     def deal(self):
         for player_number in range(4):
             self.deck.deal(self.players[player_number].hand, times = self.get_num_to_deal())
-        self.update_play()
+
 
     def to_obs(self):
         return {}
 
     def update_play(self):
-        print(f"Round: {self.round}, Play: {self.play}")
-        print(f"Length of deal ammounts for round {self.round}: {len(self.deal_amounts[self.round - 1])}")
         if self.play == len(self.deal_amounts[self.round - 1]): # if it is time to go to the next round
             self.play = 1
             self.round += 1
         else:
             self.play += 1
 
-        print("NEW ROUND: ", self.round, self.play)
-        
         if self.round == 5:
             self.done = True
 
@@ -136,21 +131,28 @@ class Game:
 
     def get_plays(self, players):
         for player_num in players:
-            self.add_play(self.players[player_num].play(self.to_obs()))
+            if player_num == self.first_to_play:
+                self.add_play(self.ask_to_play(player_num), first=True)
+            else:
+                self.add_play(self.ask_to_play(player_num))
 
-    def add_play(self, play):
+    def add_play(self, play, first=False):
+        if first:
+            self.first_suit = play.suit
         self.in_play.append(play)
 
     def ask_to_play(self, player_num):
         return self.players[player_num].play(self.to_obs())
 
     def process_hand_results(self):
-        self.update_take()
+        winner = self.update_take()
+        self.first_to_play = winner
         self.reset_play()
 
     def update_take(self):
         play_winner = (self.first_to_play + self.winner(self.in_play)) % 4
         self.players[play_winner].add_take()
+        return play_winner
 
     def winner(self, cards):
         wildsuit = self.wild_suit

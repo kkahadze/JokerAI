@@ -152,19 +152,13 @@ def test_pre_plays():
 def test_add_play():
     # This function tests the add_play() function in game.py to assure that it adds the correct card to the in_play list
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-    game.reset()
+    game.reset_vars()
     game.deal()
-    action = 1
-    card = int_to_card(action)
-    game.add_play(card)
-    assert game.in_play[0] == card
-
-    game.reset()
-    game.deal()
-    card = random.choice(game.players[game.first_to_play].hand)
-    game.add_play(card)
-    assert game.in_play[0] == int_to_card(action)
-    assert game.in_play[0] not in game.players[game.first_to_play].hand
+    game.first_to_play = 0
+    choice = random.choice(game.players[0].hand)
+    game.add_play(choice, first=True)
+    assert choice in game.in_play
+    assert game.first_suit == choice.suit
 
 def test_is_done():
     # This function tests the is_done() function in game.py to assure that it returns True when the game is done and False when it is not
@@ -230,4 +224,68 @@ def test_process_hand_results():
     assert game.in_play == []
     assert game.first_suit == 4
 
+def test_get_calls():
+    game = Game()
+    game.reset_vars()
+    for player_num in range(game.first_to_play, game.first_to_play + 4):
+        cards_per_player = game.get_num_to_deal()
+        game.deck.deal(game.players[player_num % 4].hand, times = cards_per_player) # player num needs to be modded to get the correct players
+        
+    game.get_calls()
 
+    assert game.players[0].taken >= 0 and game.players[0].taken <= 1
+    assert game.players[1].taken >= 0 and game.players[1].taken <= 1
+    assert game.players[2].taken >= 0 and game.players[2].taken <= 1
+    assert game.players[3].taken >= 0 and game.players[3].taken <= 1
+
+def test_get_num_to_deal():
+    game = Game(only_nines=False)
+    game.reset_vars()
+    assert game.get_num_to_deal() == 1
+
+    game = Game(only_nines=True)
+    game.reset_vars()
+    assert game.get_num_to_deal() == 9
+
+def test_game_reset():
+    game = Game([RandomCallerRandomPlayer(5), RandomCallerRandomPlayer(6), RandomCallerRandomPlayer(7), RandomCallerRandomPlayer(8)])
+    game.deck.pop(0)
+    game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
+    game.round = 12
+    game.play = 12
+    game.first_to_play = 12
+    game.first_suit = 11
+
+    game.reset()
+
+    assert len(game.deck) == 32
+    assert len(game.in_play)
+    assert game.round == 1
+    assert game.play == 1
+    print("FIRST_SUIT: ", game.first_suit)
+    print("CARDS IN PLAY: ", game.in_play)
+    print("SUIT OF FIRST CARD IN PLAY", game.in_play[0].suit)
+    assert game.first_to_play >= 0 and game.first_to_play <= 3
+    assert game.first_to_play == 0 or game.first_suit == game.in_play[0].suit
+
+    assert game.players[0].number == 5
+    assert game.players[1].number == 6
+    assert game.players[2].number == 7
+    assert game.players[3].number == 8
+
+def test_game_reset_vars():
+    game = Game()
+    game.reset_vars()
+    assert game.round == 1
+    assert game.play == 1
+    assert game.first_to_play >= 0 and game.first_to_play <= 3
+    assert game.first_suit == 4
+
+def test_first_play():
+    game = Game()
+    game.reset()
+    first = game.first_to_play
+    if first == 0:
+        assert game.first_suit == 4
+    else:
+        assert game.first_suit == game.in_play[0].suit
