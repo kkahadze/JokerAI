@@ -42,9 +42,9 @@ class Game:
         self.get_calls()
 
         player_num = self.first_to_play
-        players_before = range(self.first_to_play, 4)
-
-        self.get_plays(players_before)
+        if player_num != 0: 
+            players_before = range(self.first_to_play, 4)
+            self.get_plays(players_before)
 
     def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play and done
         self.deck = Deck()

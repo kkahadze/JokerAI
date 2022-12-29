@@ -289,3 +289,9 @@ def test_first_play():
         assert game.first_suit == 4
     else:
         assert game.first_suit == game.in_play[0].suit
+
+    assert game.play == 1
+    assert game.round == 1
+    print(f"Player 0 Cards: {game.players[0].hand}")
+    print(f"In Play: {game.in_play}")
+    assert [card not in game.in_play for card in game.players[0].hand].count(True) == game.get_num_to_deal()
