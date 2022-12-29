@@ -196,8 +196,11 @@ def test_is_done():
 
 def test_winner():
     game = Game()
-    game.first_suit = 0
-    game.wild_suit = 1
-
-    assert game.winner([Card(6, 0), Card(7, 0), Card(6, 2), Card(7, 2)]) == 1
-
+    game.first_suit = 3
+    game.wild_suit = 0
+    
+    assert game.winner([Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]) == 1
+    assert game.winner([Card(6, 3), Card(7, 3), Card(6, 2), Card(9, 1)]) == 1
+    assert game.winner([Card(6, 3), Card(7, 3), Card(6, 0), Card(9, 2)]) == 2
+    assert game.winner([Card(6, 0), Card(7, 0), Card(15, 1), Card(15, 0)]) == 3
+    assert game.winner([Card(12, 3), Card(7, 1), Card(15, 2), Card(9, 1)]) == 0
