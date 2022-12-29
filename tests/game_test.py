@@ -204,3 +204,30 @@ def test_winner():
     assert game.winner([Card(6, 3), Card(7, 3), Card(6, 0), Card(9, 2)]) == 2
     assert game.winner([Card(6, 0), Card(7, 0), Card(15, 1), Card(15, 0)]) == 3
     assert game.winner([Card(12, 3), Card(7, 1), Card(15, 2), Card(9, 1)]) == 0
+
+def test_update_takes():
+    game = Game()
+    game.reset_vars()
+    game.first_suit = 3
+    game.wild_suit = 0
+    game.first_to_play = 0
+
+    game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
+    game.update_take()
+
+    assert game.players[1].taken == 1
+
+def test_process_hand_results():
+    game = Game()
+    game.reset_vars()
+    game.first_suit = 3
+    game.wild_suit = 0
+    game.first_to_play = 0
+    game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
+    game.process_hand_results()
+
+    assert game.players[1].taken == 1
+    assert game.in_play == []
+    assert game.first_suit == 4
+
+

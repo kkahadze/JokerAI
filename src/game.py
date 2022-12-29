@@ -145,11 +145,11 @@ class Game:
         return self.players[player_num].play(self.to_obs())
 
     def process_hand_results(self):
+        self.update_take()
         self.reset_play()
-        self.update_takes()
 
-    def update_takes(self):
-        play_winner = self.winner()
+    def update_take(self):
+        play_winner = (self.first_to_play + self.winner(self.in_play)) % 4
         self.players[play_winner].add_take()
 
     def winner(self, cards):
