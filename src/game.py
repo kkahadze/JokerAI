@@ -66,7 +66,7 @@ class Game:
 
     def step(self, action):
         card = int_to_card(action)
-        self.play_card(card)
+        self.add_play(card)
         
         self.pre_plays()
 
@@ -123,6 +123,8 @@ class Game:
 
         if self.round == 5:
             self.done = True
+
+        self.dealer = (self.dealer + 1) % 4
 
     def hand_empty(self):
         return len(self.players[0].hand) == 0

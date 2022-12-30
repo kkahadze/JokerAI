@@ -259,12 +259,9 @@ def test_game_reset():
     game.reset()
 
     assert len(game.deck) == 32
-    assert len(game.in_play)
+    assert isinstance(len(game.in_play), int) and len(game.in_play) >= 0 and len(game.in_play) <= 3
     assert game.round == 1
     assert game.play == 1
-    print("FIRST_SUIT: ", game.first_suit)
-    print("CARDS IN PLAY: ", game.in_play)
-    print("SUIT OF FIRST CARD IN PLAY", game.in_play[0].suit)
     assert game.first_to_play >= 0 and game.first_to_play <= 3
     assert game.first_to_play == 0 or game.first_suit == game.in_play[0].suit
 
@@ -281,7 +278,7 @@ def test_game_reset_vars():
     assert game.first_to_play >= 0 and game.first_to_play <= 3
     assert game.first_suit == 4
 
-def test_first_play():
+def test_reset_and_one_step():
     game = Game()
     game.reset()
     first = game.first_to_play
@@ -292,6 +289,20 @@ def test_first_play():
 
     assert game.play == 1
     assert game.round == 1
-    print(f"Player 0 Cards: {game.players[0].hand}")
-    print(f"In Play: {game.in_play}")
     assert [card not in game.in_play for card in game.players[0].hand].count(True) == game.get_num_to_deal()
+    assert all([len(player.hand) >= 0 and len(player.hand) <= 1 for player in game.players[1:4]])
+
+    dealer = game.dealer
+
+    game.step(card_to_int(game.players[0].play()))
+
+    assert game.play == 2
+    assert game.round == 1
+    assert game.dealer == (dealer + 1) % 4
+
+    assert sum([player.taken for player in game.players]) == 1
+
+
+
+
+    
