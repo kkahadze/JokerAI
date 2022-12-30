@@ -208,7 +208,7 @@ class Game:
         obs = self.to_obs()
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
-        print("First to play: " + int_to_suit(obs['first_to_play']))
+        print("First to play: " + obs['first_to_play'])
         for num, player in enumerate(obs["players"]):
             print("Player: " + str(num))
             print("Hand: " + str(self.players[num].hand))
@@ -226,7 +226,7 @@ class Game:
         obs = self.to_obs()
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
-        print("First to play: " + int_to_suit(obs['first_to_play']))
+        print("First to play: " + obs['first_to_play'])
         for num, player in enumerate(obs["players"]):
             print("Player: " + str(num))
             if num == 0:
