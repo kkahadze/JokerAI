@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit
+from src.utils import int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -114,10 +114,23 @@ class Game:
         self.deck = Deck()
         for player_number in range(4):
             self.deck.deal(self.players[player_number].hand, times = self.get_num_to_deal())
+        if self.deck:
+            wild_card = self.deck[0]
+            self.wild_card = wild_card
+            if wild_card.value != 15:
+                self.wild_suit = wild_card.suit
+            else:
+                self.wild_suit = 4
 
     def to_obs(self):
         return {
             "dealt": self.get_num_to_deal(),
+            "first_to_play": self.first_to_play,
+            "dealer": self.dealer,
+            "wild_suit": self.wild_suit,
+            "first_suit": self.first_suit,
+            "jokers_remaining": self.jokers_remaining,
+            "in_play": self.in_play,
             "players": [player.to_obs() for player in self.players]
         }
 
@@ -188,3 +201,42 @@ class Game:
 
     def is_done(self):
         return self.done
+
+    def print_game(self):
+        obs = self.to_obs()
+        print("Dealt: " + str(obs["dealt"]))
+        print("Wildsuit: " + int_to_suit(obs['wild_suit']))
+        print("First to play: " + int_to_suit(obs['first_to_play']))
+        for num, player in enumerate(obs["players"]):
+            print("Player: " + str(num))
+            print("Hand: " + str(self.players[num].hand))
+            print("Calls: " + str(player["desired"]))
+            print("Takes: " + str(player["taken"]))
+            print("")
+
+        print("In play: " + str(self.in_play))
+
+
+        print("Current scores: \n Player 0: " + str(self.players[0].score) + "\n Player 1: " + str(self.players[1].score) + "\n Player 2: " + str(self.players[2].score) + "\n Player 3: " + str(self.players[3].score) + "\n")
+        
+
+    def print_obs(self):
+        obs = self.to_obs()
+        print("Dealt: " + str(obs["dealt"]))
+        print("Wildsuit: " + int_to_suit(obs['wild_suit']))
+        print("First to play: " + int_to_suit(obs['first_to_play']))
+        for num, player in enumerate(obs["players"]):
+            print("Player: " + str(num))
+            if num == 0:
+                print("Hand: " + str(player["hand"]))
+            print("Calls: " + str(player["desired"]))
+            print("Takes: " + str(player["taken"]))
+            
+
+        print("In play: " + str(self.in_play))
+
+        
+
+game = Game()
+game.reset()
+game.print_game()
