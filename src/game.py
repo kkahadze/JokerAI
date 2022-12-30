@@ -130,7 +130,9 @@ class Game:
             "first_suit": self.first_suit,
             "jokers_remaining": self.jokers_remaining,
             "in_play": [card_to_int(self.in_play[card_num]) if card_num < len(self.in_play) else 36 for card_num in range(3)],
-            "players": [player.to_obs() for player in self.players]
+            "players": {str(player.number) : player.to_obs() 
+                            for player in self.players
+                        }
         }
 
     def update_play(self):
@@ -209,7 +211,7 @@ class Game:
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
         print("First to play: " + str(obs['first_to_play']))
-        for num, player in enumerate(obs["players"]):
+        for num, player in enumerate(obs["players"].values()):
             print("Player: " + str(num))
             print("Hand: " + str(self.players[num].hand))
             print("Calls: " + str(player["desired"]))
@@ -227,7 +229,7 @@ class Game:
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
         print("First to play: " + str(obs['first_to_play']))
-        for num, player in enumerate(obs["players"]):
+        for num, player in enumerate(obs["players"].values()):
             print("Player: " + str(num))
             if num == 0:
                 print("Hand: " + str(player["hand"]))

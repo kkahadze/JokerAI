@@ -1,6 +1,7 @@
 from src.player import Player
 import random
 from agents.utils import get_complement
+from src.utils import playable
 
 class RandomCallerRandomPlayer(Player):
     def __init__(self, number):
@@ -14,8 +15,8 @@ class RandomCallerRandomPlayer(Player):
         self.desired = call
         return call
 
-    def play(self, observation = None):        
-        choice = random.choice(self.hand)
+    def play(self, observation = None):
+        choice = random.choice(playable(self.hand))
         self.hand.remove(choice)
         return choice
 
