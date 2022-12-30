@@ -125,6 +125,11 @@ class Game:
             self.done = True
 
         self.dealer = (self.dealer + 1) % 4
+        self.reset_players()
+
+    def reset_players(self):
+        for player in self.players:
+            player.reset()
 
     def hand_empty(self):
         return len(self.players[0].hand) == 0
