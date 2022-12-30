@@ -77,9 +77,8 @@ class Game:
         
         if self.hand_empty():
             self.new_hand()
-            
+        
         self.post_plays()
-
 
     def next_hand(self):
         return        
@@ -98,21 +97,29 @@ class Game:
         return self.deal_amounts[self.round - 1][self.play - 1]
 
     def new_hand(self):
-        self.deal()
+        self.update_score()
         self.update_play()
+        self.deal()
         self.get_calls()
+
+    def update_score(self):
+        for player in self.players:
+            player.update_score(self.get_num_to_deal())
 
     def get_calls(self):
         for player_num in range(4):
             self.players[player_num].call(self.to_obs())
 
     def deal(self):
+        self.deck = Deck()
         for player_number in range(4):
             self.deck.deal(self.players[player_number].hand, times = self.get_num_to_deal())
 
-
     def to_obs(self):
-        return {}
+        return {
+            "dealt": self.get_num_to_deal(),
+            "players": [player.to_obs() for player in self.players]
+        }
 
     def update_play(self):
         if self.play == len(self.deal_amounts[self.round - 1]): # if it is time to go to the next round

@@ -37,11 +37,17 @@ def test_player_get_across():
 
 def test_update_score():
     player = Player(0)
-    player.update_score(1, 1, 1)
+    player.set_desired(1)
+    player.set_taken(1)
+    player.update_score(1)
     assert player.score == 100
 
-    player.update_score(1, 1, 2)
+    player.set_desired(1)
+    player.set_taken(1)
+    player.update_score(2)
     assert player.score == 200
 
-    player.update_score(3, 3, 3)
+    player.set_desired(3)
+    player.set_taken(3)
+    player.update_score(3)
     assert player.score == 500

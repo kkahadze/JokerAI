@@ -27,16 +27,16 @@ class Player():
     def across(self) -> int:
         return (self.number + 2) % 4
     
-    def update_score(self, desired: int, actual: int, dealt: int):
-        if desired == actual: 
-            if actual == dealt:
+    def update_score(self, dealt: int):
+        if self.desired == self.taken: 
+            if self.taken == dealt:
                 self.score += dealt * 100 # 1 -> 100, 2 -> 200, 3 -> 300, 4 -> 400 ... 
             else:
-                self.score += actual * 50 + 50 # 1 -> 100, 2 -> 150, 3 -> 200, 4 -> 250 ...
-        elif actual == 0: # 0 -> -200, bust/ხვიშტი
+                self.score += self.taken * 50 + 50 # 1 -> 100, 2 -> 150, 3 -> 200, 4 -> 250 ...
+        elif self.taken == 0: # 0 -> -200, bust/ხვიშტი
             self.score -= 200
         else: # 1 -> 10, 2 -> 20, 3 -> 30, 4 -> 40 ...
-            self.score += actual * 10
+            self.score += self.taken * 10
 
     def reset(self):
         self.desired = -1

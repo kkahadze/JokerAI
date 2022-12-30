@@ -279,6 +279,7 @@ def test_game_reset_vars():
     assert game.first_suit == 4
 
 def test_reset_and_one_step():
+    random.seed(1)
     game = Game()
     game.reset()
     first = game.first_to_play
@@ -299,10 +300,10 @@ def test_reset_and_one_step():
     assert game.play == 2
     assert game.round == 1
     assert game.dealer == (dealer + 1) % 4
+    dealer = game.dealer
 
-    assert sum([player.taken for player in game.players]) == 1
+    assert sum([player.taken for player in game.players]) == 0
+    assert not all([not player.score for player in game.players])
 
 
 
-
-    
