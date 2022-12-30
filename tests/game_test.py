@@ -156,7 +156,7 @@ def test_add_play():
     game.deal()
     game.first_to_play = 0
     choice = random.choice(game.players[0].hand)
-    game.add_play(choice, first=True)
+    game.add_play(card_to_int(choice), first=True)
     assert choice in game.in_play
     assert game.first_suit == choice.suit
 
@@ -165,8 +165,8 @@ def test_is_done():
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
     game.reset_vars()
     game.deal()
-    card = random.choice(game.players[game.first_to_play].hand)
-    game.add_play(card)
+    card_int = random.choice(game.players[game.first_to_play].hand)
+    game.add_play(card_to_int(card_int), first=True)
     assert game.is_done() == False
 
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)

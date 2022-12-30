@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit
+from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -65,8 +65,7 @@ class Game:
         # self.gone = [0 for i in range(36)]
 
     def step(self, action):
-        card = int_to_card(action)
-        self.add_play(card)
+        self.add_play(action)
         
         self.pre_plays()
 
@@ -130,7 +129,7 @@ class Game:
             "wild_suit": self.wild_suit,
             "first_suit": self.first_suit,
             "jokers_remaining": self.jokers_remaining,
-            "in_play": self.in_play,
+            "in_play": [card_to_int(self.in_play[card_num]) if card_num < len(self.in_play) else 36 for card_num in range(3)],
             "players": [player.to_obs() for player in self.players]
         }
 
@@ -158,15 +157,18 @@ class Game:
 
     def get_plays(self, players):
         for player_num in players:
+            choice = self.ask_to_play(player_num)
+            action = card_to_int(choice)
             if player_num == self.first_to_play:
-                self.add_play(self.ask_to_play(player_num), first=True)
+                self.add_play(action, first=True)
             else:
-                self.add_play(self.ask_to_play(player_num))
+                self.add_play(action)
 
     def add_play(self, play, first=False):
+        card = int_to_card(play)
         if first:
-            self.first_suit = play.suit
-        self.in_play.append(play)
+            self.first_suit = card.suit
+        self.in_play.append(card)
 
     def ask_to_play(self, player_num):
         return self.players[player_num].play(self.to_obs())
@@ -239,4 +241,6 @@ class Game:
 
 game = Game()
 game.reset()
+game.print_game()
+game.step(card_to_int(game.players[0].play(game.to_obs())))
 game.print_game()
