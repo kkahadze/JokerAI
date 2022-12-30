@@ -221,15 +221,9 @@ def truncate_at_first_none(cards: list):
             return cards[:i]
     return cards
 
-def playable(observation, optional_hand=[]): # Returns a list of cards that can be played, accounting for jokers
-    if not optional_hand:
-        hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
-    else:
-        hand = optional_hand
+def playable(observation): # Returns a list of cards that can be played, accounting for jokers
+    hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
 
-    if optional_hand and len(optional_hand) == 1:
-        return optional_hand
-        
     if cards_in_hand(observation) == 1:
         return [hand[0]]
     else:
