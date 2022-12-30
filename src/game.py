@@ -241,8 +241,8 @@ class Game:
 
         
 
-game = Game()
-game.reset()
-game.print_game()
-game.step(card_to_int(game.players[0].play(game.to_obs())))
-game.print_game()
+# game = Game()
+# game.reset()
+# game.print_game()
+# game.step(card_to_int(game.players[0].play(game.to_obs())))
+# game.print_game()

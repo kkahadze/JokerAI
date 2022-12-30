@@ -18,4 +18,4 @@ def test_get_complement():
     game.reset()
     for i in range(9):
         assert sum([player.desired for player in game.players]) != game.get_num_to_deal()
-        game.step(card_to_int(game.players[0].play()))
+        game.step(card_to_int(game.players[0].play(game.to_obs())))

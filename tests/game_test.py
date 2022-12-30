@@ -295,7 +295,7 @@ def test_reset_and_one_step():
 
     dealer = game.dealer
 
-    game.step(card_to_int(game.players[0].play()))
+    game.step(card_to_int(game.players[0].play(game.to_obs())))
 
     assert game.play == 2
     assert game.round == 1
