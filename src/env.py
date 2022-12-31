@@ -20,25 +20,25 @@ class JokerEnv(gym.Env):
                             {
                                 # the first one is 36 since the player must have at least one card in possesion when taking an action
                                 "hand": spaces.MultiDiscrete([36, 37, 37, 37, 37, 37, 37, 37, 37]), 
-                                "desired": spaces.Discrete(10), # 0-9
+                                "desired": spaces.Discrete(11), # -1 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
                         "1": spaces.Dict(
                             {
-                                "desired": spaces.Discrete(10), # 0-9
+                                "desired": spaces.Discrete(11), # -1 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
                         "2": spaces.Dict(
                             {
-                                "desired": spaces.Discrete(10), # 0-9
+                                "desired": spaces.Discrete(11), # -1 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
                         "3": spaces.Dict(
                             {
-                                "desired": spaces.Discrete(10), # 0-9
+                                "desired": spaces.Discrete(11), # -1 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
@@ -75,7 +75,7 @@ class JokerEnv(gym.Env):
 
     def reset(self):
         # Reset the state of the environment to an initial state
-        self.game = JokerGame()
+        self.game = Game()
         self.observation_space['in_play'] = [36, 36, 36]
         self.observation_space['wild_suit'] = 4
 

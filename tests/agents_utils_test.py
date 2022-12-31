@@ -1,7 +1,7 @@
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 from src.game import Game
 from src.player import Player
-from agents.utils import random_call
+from agents.utils import random_call, get_complement
 import random
 from src.utils import card_to_int
 
@@ -16,6 +16,9 @@ def test_random_call():
 def test_get_complement():
     game = Game([RandomCallerRandomPlayer(i) for i in range(4)])
     game.reset()
-    for _ in range(9):
-        assert sum([player.desired for player in game.players]) != game.get_num_to_deal()
+    for _ in range(24):
+        if game.first_to_play == 1:
+            assert game.get_num_to_deal != sum([player.desired for player in game.players])
+        # game.print_game()
+        # assert sum([player.desired for player in game.players]) != game.get_num_to_deal()
         game.step(card_to_int(game.players[0].play(game.to_obs())))

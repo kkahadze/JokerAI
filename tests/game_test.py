@@ -145,10 +145,6 @@ def test_reset_play():
     assert game.in_play == []
     assert game.first_suit == 4
 
-def test_pre_plays():
-    # This function tests the pre_plays() function in game.py to assure that it finishes the play
-    assert True
-
 def test_add_play():
     # This function tests the add_play() function in game.py to assure that it adds the correct card to the in_play list
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
@@ -304,6 +300,8 @@ def test_reset_and_one_step():
 
     assert sum([player.taken for player in game.players]) == 0
     assert not all([not player.score for player in game.players])
+
+
 
 
 

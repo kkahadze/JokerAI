@@ -41,6 +41,8 @@ class Game:
         self.deal()
         self.get_calls()
 
+        print("FIRST PLAYER: ", self.first_to_play)
+
         player_num = self.first_to_play
         if player_num != 0: 
             players_before = range(self.first_to_play, 4)
@@ -122,6 +124,13 @@ class Game:
                 self.wild_suit = 4
 
     def to_obs(self):
+        in_play_ints = []
+        for card_num in range(3):
+            if card_num < len(self.in_play):
+                in_play_ints.append(card_to_int(self.in_play[card_num]))
+            else:
+                in_play_ints.append(36)
+
         return {
             "dealt": self.get_num_to_deal(),
             "first_to_play": self.first_to_play,
@@ -129,7 +138,7 @@ class Game:
             "wild_suit": self.wild_suit,
             "first_suit": self.first_suit,
             "jokers_remaining": self.jokers_remaining,
-            "in_play": [card_to_int(self.in_play[card_num]) if card_num < len(self.in_play) else 36 for card_num in range(3)],
+            "in_play": in_play_ints,
             "players": {str(player.number) : player.to_obs() 
                             for player in self.players
                         }
