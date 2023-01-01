@@ -301,7 +301,12 @@ def test_reset_and_one_step():
     assert sum([player.taken for player in game.players]) == 0
     assert not all([not player.score for player in game.players])
 
-
-
+def test_play():
+    game = Game()
+    game.reset()
+    # game.print_game()
+    while not game.is_done():
+        game.step(card_to_int(game.players[0].play(game.to_obs())))
+        # game.print_game()
 
 

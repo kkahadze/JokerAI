@@ -41,8 +41,6 @@ class Game:
         self.deal()
         self.get_calls()
 
-        print("FIRST PLAYER: ", self.first_to_play)
-
         player_num = self.first_to_play
         if player_num != 0: 
             players_before = range(self.first_to_play, 4)
@@ -79,10 +77,8 @@ class Game:
         if self.hand_empty():
             self.new_hand()
         
-        self.post_plays()
-
-    def next_hand(self):
-        return        
+        if not self.done:
+            self.post_plays()
 
     def pre_plays(self):
         if self.first_to_play != 1:
@@ -100,8 +96,9 @@ class Game:
     def new_hand(self):
         self.update_score()
         self.update_play()
-        self.deal()
-        self.get_calls()
+        if not self.done:
+            self.deal()
+            self.get_calls()
 
     def update_score(self):
         for player in self.players:
@@ -217,9 +214,17 @@ class Game:
 
     def print_game(self):
         obs = self.to_obs()
+        
+        print("____________________________________________________________________________")
+        print()
+        
+        print("Round: " + str(self.round))
+        print("Play: " + str(self.play))
+
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
         print("First to play: " + str(obs['first_to_play']))
+
         for num, player in enumerate(obs["players"].values()):
             print("Player: " + str(num))
             print("Hand: " + str(self.players[num].hand))
@@ -247,12 +252,3 @@ class Game:
             
 
         print("In play: " + str(self.in_play))
-
-        
-
-# game = Game()
-# game.reset()
-# game.print_game()
-# for i in range(24):
-#     game.step(card_to_int(game.players[0].play(game.to_obs())))
-#     # game.print_game()

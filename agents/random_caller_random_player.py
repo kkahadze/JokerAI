@@ -17,15 +17,9 @@ class RandomCallerRandomPlayer(Player):
 
     def play(self, observation):
         if self.number == 0:
-            print("Calling playable")
             choices = playable(observation)
         else:
-            print("Calling opp playable")
             choices = self.opp_playable(observation)
-        
-        if len(choices) == 0:
-            print("CHOICES EMPTY")
-            print(self.hand)
         choice = random.choice(choices)
         self.hand.remove(choice)
         return choice
@@ -47,11 +41,7 @@ class RandomCallerRandomPlayer(Player):
         wild_suit = observation["wild_suit"]
         first_suit = observation["first_suit"]
         first_to_play = observation["first_to_play"]
-
-        print("First to play: {}".format(first_to_play))
-        print("First suit: {}".format(first_suit))
-        print("Wild suit: {}".format(wild_suit))
-
+        
         if self.number == first_to_play or len(self.hand) == 1:
             return self.hand
         

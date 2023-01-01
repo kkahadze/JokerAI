@@ -16,9 +16,8 @@ def test_random_call():
 def test_get_complement():
     game = Game([RandomCallerRandomPlayer(i) for i in range(4)])
     game.reset()
-    for _ in range(24):
+    for _ in range(23):
         if game.first_to_play == 1:
             assert game.get_num_to_deal != sum([player.desired for player in game.players])
-        # game.print_game()
-        # assert sum([player.desired for player in game.players]) != game.get_num_to_deal()
+        game.print_game()
         game.step(card_to_int(game.players[0].play(game.to_obs())))
