@@ -306,16 +306,20 @@ def has_first_suit(observation):
     '''
     return contains_suit(first_suit_index(observation), truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"]))))
 
-def have_wild_suit(observation):
+def have_wild_suit(observation, number = 0, cards = []):
     '''
     Returns True if Player 0's hand contains the wildsuit
     '''
     wildsuit = get_wildsuit(observation)
-    player_cards = observation["players"]["0"]["hand"]
-    wildsuit_cards = list(filter(lambda card_int: card_int == wildsuit, player_cards))
-    truncated_wild_ints = truncate_at_first_none(wildsuit_cards)
-    truncated_wilds = list(map(lambda card_int: int_to_card(card_int), truncated_wild_ints))
-    return contains_suit(wildsuit, truncated_wilds)
+    if number == 0:
+        player_cards = observation["players"]["0"]["hand"]
+        wildsuit_cards = list(filter(lambda card_int: card_int == wildsuit, player_cards))
+        truncated_wild_ints = truncate_at_first_none(wildsuit_cards)
+        truncated_wilds = list(map(lambda card_int: int_to_card(card_int), truncated_wild_ints))
+        return contains_suit(wildsuit, truncated_wilds)
+    else:
+        return contains_suit(wildsuit, cards)
+    
 
 def highest_of_suit(cards, suit):
     highest = 0

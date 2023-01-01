@@ -18,8 +18,14 @@ class RandomCallerRandomPlayer(Player):
     def play(self, observation):
         if self.number == 0:
             choices = playable(observation)
+            if not choices:
+                print("Player 0: No playable cards")
+                print("Player {}: Hand: {}".format(self.number, self.hand))
         else:
             choices = self.opp_playable(observation)
+            if not choices:
+                print("Player {}: No playable cards".format(self.number))
+                print("Player {}: Hand: {}".format(self.number, self.hand))
         choice = random.choice(choices)
         self.hand.remove(choice)
         return choice
@@ -38,32 +44,63 @@ class RandomCallerRandomPlayer(Player):
             }
     
     def opp_playable(self, observation):
+        print("_________________")
         wild_suit = observation["wild_suit"]
         first_suit = observation["first_suit"]
         first_to_play = observation["first_to_play"]
         
+        opp_playable = []
+
         if self.number == first_to_play or len(self.hand) == 1:
-            return self.hand
+            opp_playable = self.hand
         
         else:
             if first_suit != 4:
                 if self.have_suit(first_suit):
-                    return filter_by_suit_with_joks(self.hand, first_suit)
+                    opp_playable = filter_by_suit_with_joks(self.hand, first_suit)
+                    print("I Have first suit!")
                 else:
                     if not wildsuit_exists(observation):
-                        return self.hand
+                        opp_playable = self.hand
+                        print("I Don't have first suit!")
+                        print("Wild suit doesn't exist!")
                     else:
-                        if not have_wild_suit(observation):
-                            return self.hand
+                        if self.number == 0:
+                            have_wild = have_wild_suit(observation)
                         else:
-                            return filter_by_suit_with_joks(self.hand, wild_suit)
+                            have_wild = have_wild_suit(observation, self.number, self.hand)
+
+                        if not have_wild:
+                            opp_playable = self.hand
+                            print("I Don't have first suit!")
+                            print("I Don't have wild suit but it exists!")
+                        else:
+                            opp_playable = filter_by_suit_with_joks(self.hand, wild_suit)
+                            print("I Don't have first suit!")
+                            print("I have wild suit!")
             elif not wildsuit_exists(observation):
-                return self.hand
+                opp_playable =  self.hand
+                print("Wild suit doesn't exist!")
+                print("First suit doesn't exist!")
             else:
                 if not self.have_suit(wild_suit):
-                    return self.hand
+                    opp_playable =  self.hand
+                    print("Wildsuit exists!")
+                    print("I don't have wild suit!")
+                    print("First suit doesn't exist!")
                 else:
-                    return filter_by_suit_with_joks(self.hand, wild_suit)
+                    opp_playable =  filter_by_suit_with_joks(self.hand, wild_suit)
+                    print("Wildsuit exists!")
+                    print("I have wild suit!")
+                    print("First suit doesn't exist!")
+        
+        if not opp_playable:
+            print("Player {}: Hand: {}".format(self.number, self.hand))
+            print("Player {}: Wild suit: {}".format(self.number, wild_suit))
+            print("Player {}: First suit: {}".format(self.number, first_suit))
+            print("Player {}: First to play: {}".format(self.number, first_to_play))
+            
+        return opp_playable
 
     def have_suit(self, suit):
         for card in self.hand:
