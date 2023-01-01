@@ -346,3 +346,11 @@ def index_of_highest_of_suit(cards, suit):
         return highest
     else:
         return None
+
+def index_of_latest_joker(cards):
+    index = -1
+    for i, card in enumerate(cards):
+        if card.value == 15:
+            index = i
+
+    return index

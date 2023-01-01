@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit
+from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit, index_of_latest_joker
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -66,9 +66,7 @@ class Game:
 
     def step(self, action):
         self.add_play(action)
-        
         self.pre_plays()
-
         self.process_hand_results()
 
         if self.is_done():
@@ -193,12 +191,14 @@ class Game:
         wildsuit = self.wild_suit
         first_suit = cards[0].suit
 
-        if wildsuit == 4: # no wildsuit
+        if 15 in [card.value for card in cards]: # joker was played
+            return index_of_latest_joker(cards)
+        elif wildsuit == 4: # no wildsuit
             return index_of_highest_of_suit(cards, first_suit)
         else:
             if first_suit == wildsuit:
                 return index_of_highest_of_suit(cards, first_suit)
-            elif contains_suit(wildsuit, cards): # a wildsuit was playes
+            elif contains_suit(wildsuit, cards): # a wildsuit was played
                 return index_of_highest_of_suit(cards, wildsuit)
             else:
                 return index_of_highest_of_suit(cards, first_suit)
