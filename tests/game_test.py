@@ -328,3 +328,26 @@ def test_100_games():
 #         while not game.is_done():
 #             game.step(card_to_int(game.players[0].play(game.to_obs())))
 #         #     # game.print_game()
+
+def test_second_card_wins():
+    game = Game()
+    game.first_suit = 3
+    game.wild_suit = 0
+    
+    game.in_play = [Card(6, 1), # Transformed Joker
+                    Card(7, 3), 
+                    Card(6, 3), 
+                    Card(7, 2)]
+    assert game.winner(game.in_play) == 0
+    
+    game.in_play = [Card(6, 1), # Joker
+                    Card(7, 1), 
+                    Card(6, 3), 
+                    Card(7, 2)]
+    assert game.winner(game.in_play) == 1
+    
+    game.in_play = [Card(6, 0), # Transformed Joker
+                    Card(7, 3), 
+                    Card(6, 0), # Non-Joker 6 
+                    Card(7, 2)]
+    assert game.winner(game.in_play) == 2

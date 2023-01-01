@@ -338,7 +338,7 @@ def index_of_highest_of_suit(cards, suit):
     highest = 0
     max = 0
     for i, card in enumerate(cards):
-        if card.suit == suit and card.value > max:
+        if card.suit == suit and card.value >= max:
             max = card.value
             highest = i
     
@@ -346,5 +346,3 @@ def index_of_highest_of_suit(cards, suit):
         return highest
     else:
         return None
-
-    

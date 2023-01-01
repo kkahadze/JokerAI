@@ -161,8 +161,6 @@ class Game:
     def hand_empty(self):
         return len(self.players[0].hand) == 0
 
-    # calls and plays should be stored in player objects
-
     def get_plays(self, players):
         for player_num in players:
             choice = self.ask_to_play(player_num)
@@ -214,13 +212,10 @@ class Game:
 
     def print_game(self):
         obs = self.to_obs()
-        
         print("____________________________________________________________________________")
         print()
-        
         print("Round: " + str(self.round))
         print("Play: " + str(self.play))
-
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
         print("First to play: " + str(obs['first_to_play']))
@@ -233,13 +228,12 @@ class Game:
             print("")
 
         print("In play: " + str(self.in_play))
-
-
         print("Current scores: \n Player 0: " + str(self.players[0].score) + "\n Player 1: " + str(self.players[1].score) + "\n Player 2: " + str(self.players[2].score) + "\n Player 3: " + str(self.players[3].score) + "\n")
         
 
     def print_obs(self):
         obs = self.to_obs()
+        print("____________________________________________________________________________")
         print("Dealt: " + str(obs["dealt"]))
         print("Wildsuit: " + int_to_suit(obs['wild_suit']))
         print("First to play: " + str(obs['first_to_play']))
@@ -249,6 +243,4 @@ class Game:
                 print("Hand: " + str(player["hand"]))
             print("Calls: " + str(player["desired"]))
             print("Takes: " + str(player["taken"]))
-            
-
         print("In play: " + str(self.in_play))
