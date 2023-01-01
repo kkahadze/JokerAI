@@ -319,3 +319,12 @@ def test_100_games():
             game.step(card_to_int(game.players[0].play(game.to_obs())))
         #     # game.print_game()
     
+# def test_1000_games():
+#     random.seed(3)
+#     for i in range(1000):
+#         game = Game()
+#         game.reset()
+#         # # game.print_game()
+#         while not game.is_done():
+#             game.step(card_to_int(game.players[0].play(game.to_obs())))
+#         #     # game.print_game()

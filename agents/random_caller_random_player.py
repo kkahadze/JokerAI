@@ -58,12 +58,9 @@ class RandomCallerRandomPlayer(Player):
             if first_suit != 4:
                 if self.have_suit(first_suit):
                     opp_playable = filter_by_suit_with_joks(self.hand, first_suit)
-                    print("I Have first suit!")
                 else:
                     if not wildsuit_exists(observation):
                         opp_playable = self.hand
-                        print("I Don't have first suit!")
-                        print("Wild suit doesn't exist!")
                     else:
                         if self.number == 0:
                             have_wild = have_wild_suit(observation)
@@ -72,34 +69,16 @@ class RandomCallerRandomPlayer(Player):
 
                         if not have_wild:
                             opp_playable = self.hand
-                            print("I Don't have first suit!")
-                            print("I Don't have wild suit but it exists!")
                         else:
                             opp_playable = filter_by_suit_with_joks(self.hand, wild_suit)
-                            print("I Don't have first suit!")
-                            print("I have wild suit!")
             elif not wildsuit_exists(observation):
                 opp_playable =  self.hand
-                print("Wild suit doesn't exist!")
-                print("First suit doesn't exist!")
             else:
                 if not self.have_suit(wild_suit):
                     opp_playable =  self.hand
-                    print("Wildsuit exists!")
-                    print("I don't have wild suit!")
-                    print("First suit doesn't exist!")
                 else:
                     opp_playable =  filter_by_suit_with_joks(self.hand, wild_suit)
-                    print("Wildsuit exists!")
-                    print("I have wild suit!")
-                    print("First suit doesn't exist!")
-        
-        if not opp_playable:
-            print("Player {}: Hand: {}".format(self.number, self.hand))
-            print("Player {}: Wild suit: {}".format(self.number, wild_suit))
-            print("Player {}: First suit: {}".format(self.number, first_suit))
-            print("Player {}: First to play: {}".format(self.number, first_to_play))
-            
+                        
         return opp_playable
 
     def have_suit(self, suit):
