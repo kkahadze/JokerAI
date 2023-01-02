@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit, index_of_latest_joker
+from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit, index_of_latest_joker, indexes_of_transformed_jokers, get_transformed_joker
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -193,15 +193,24 @@ class Game:
 
         if 15 in [card.value for card in cards]: # joker was played
             return index_of_latest_joker(cards)
-        elif wildsuit == 4: # no wildsuit
-            return index_of_highest_of_suit(cards, first_suit)
         else:
-            if first_suit == wildsuit:
+            transformed_joker = get_transformed_joker(cards)
+            if transformed_joker:
+                # print(f"cards: {cards}")
+                indexes_of_indenticals = indexes_of_transformed_jokers(cards)
+                # print(f"indexes_of_indenticals: {indexes_of_indenticals}")
+                is_transformed_suit = [True if card.suit == cards[indexes_of_indenticals[0]].suit else False for card in cards]
+                if is_transformed_suit.count(True) == len(indexes_of_indenticals):
+                    return indexes_of_indenticals[0]
+            elif wildsuit == 4: # no wildsuit
                 return index_of_highest_of_suit(cards, first_suit)
-            elif contains_suit(wildsuit, cards): # a wildsuit was played
-                return index_of_highest_of_suit(cards, wildsuit)
             else:
-                return index_of_highest_of_suit(cards, first_suit)
+                if first_suit == wildsuit:
+                    return index_of_highest_of_suit(cards, first_suit)
+                elif contains_suit(wildsuit, cards): # a wildsuit was played
+                    return index_of_highest_of_suit(cards, wildsuit)
+                else:
+                    return index_of_highest_of_suit(cards, first_suit)
 
     def reset_play(self):
         self.in_play = []
@@ -229,7 +238,6 @@ class Game:
 
         print("In play: " + str(self.in_play))
         print("Current scores: \n Player 0: " + str(self.players[0].score) + "\n Player 1: " + str(self.players[1].score) + "\n Player 2: " + str(self.players[2].score) + "\n Player 3: " + str(self.players[3].score) + "\n")
-        
 
     def print_obs(self):
         obs = self.to_obs()

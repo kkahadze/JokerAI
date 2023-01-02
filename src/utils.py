@@ -354,3 +354,15 @@ def index_of_latest_joker(cards):
             index = i
 
     return index
+
+def get_transformed_joker(cards):
+    for card in cards:
+        if card.value == 6 and cards.count(card) > 1:
+            return card
+
+def indexes_of_transformed_jokers(cards):
+    indexes = []
+    for i, card in enumerate(cards):
+        if card.value == 6 and cards.count(card) > 1:
+            indexes.append(i)
+    return indexes

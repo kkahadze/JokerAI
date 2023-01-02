@@ -331,62 +331,76 @@ def test_100_games():
 
 def test_second_card_wins():
     game = Game()
-    
-    game.in_play = [Card(6, 1), # Transformed Joker
-                    Card(7, 3), 
-                    Card(6, 3), 
-                    Card(7, 2)]
-    assert game.winner(game.in_play) == 0
-    
-    game.in_play = [Card(6, 1), # Joker
-                    Card(7, 1), 
-                    Card(6, 3), 
-                    Card(7, 2)]
-    assert game.winner(game.in_play) == 1
-    
-    game.in_play = [Card(6, 0), # Transformed Joker
-                    Card(7, 3), 
-                    Card(6, 0), # Non-Joker 6 
-                    Card(7, 2)]
-    assert game.winner(game.in_play) == 2
-    
-    game.in_play = [Card(6, 0), # Transformed Joker
-                    Card(7, 3), 
-                    Card(6, 0), # Non-Joker 6
-                    Card(15, 2)] # Joker
-    assert game.winner(game.in_play) == 3
 
-    game.in_play = [Card(6, 1), # Transformed Joker
-                    Card(7, 1), 
-                    Card(6, 0), 
-                    Card(15, 2)] # Joker
-    assert game.winner(game.in_play) == 3
-
-    game.in_play = [Card(15, 2), # Joker
-                    Card(7, 1), 
-                    Card(6, 0), 
-                    Card(15, 2)] # Joker
-    assert game.winner(game.in_play) == 3
-
-    game.in_play = [Card(15, 2), # Joker
-                    Card(7, 1), 
-                    Card(6, 0), 
-                    Card(14, 1)]
-    assert game.winner(game.in_play) == 0
-
-    game.in_play = [Card(6, 3), 
-                    Card(7, 1),
-                    Card(6, 0),
-                    Card(14, 1)]
-    assert game.winner(game.in_play) == 0
-
-    game.in_play = [Card(6, 3), 
-                    Card(7, 1),
-                    Card(6, 0),
-                    Card(7, 3)]
-    if game.wild_suit == 0:
+    for i in range(50):
+        
+        game.in_play = [Card(6, 1), # Transformed Joker
+                        Card(7, 3), 
+                        Card(6, 3), 
+                        Card(7, 2)]
         assert game.winner(game.in_play) == 0
-    else:
+        
+        game.in_play = [Card(6, 1), # Joker
+                        Card(7, 1), 
+                        Card(6, 3), 
+                        Card(7, 2)]
+        assert game.winner(game.in_play) == 1
+        
+        game.in_play = [Card(6, 0), # Transformed Joker
+                        Card(7, 3), 
+                        Card(6, 0), # Non-Joker 6 
+                        Card(7, 2)]
+        assert game.winner(game.in_play) == 0
+        
+        game.in_play = [Card(6, 0), # Transformed Joker
+                        Card(7, 3), 
+                        Card(6, 0), # Non-Joker 6
+                        Card(15, 2)] # Joker
         assert game.winner(game.in_play) == 3
-    
 
+        game.in_play = [Card(6, 1), # Transformed Joker
+                        Card(7, 1), 
+                        Card(6, 0), 
+                        Card(15, 2)] # Joker
+        assert game.winner(game.in_play) == 3
+
+        game.in_play = [Card(15, 2), # Joker
+                        Card(7, 1), 
+                        Card(6, 0), 
+                        Card(15, 2)] # Joker
+        assert game.winner(game.in_play) == 3
+
+        game.in_play = [Card(15, 2), # Joker
+                        Card(7, 1), 
+                        Card(6, 0), 
+                        Card(14, 1)]
+        assert game.winner(game.in_play) == 0
+
+        game.in_play = [Card(6, 3), 
+                        Card(7, 1),
+                        Card(6, 0),
+                        Card(14, 1)]
+        assert game.winner(game.in_play) == 0
+
+        game.in_play = [Card(6, 3), 
+                        Card(7, 1),
+                        Card(6, 0),
+                        Card(7, 3)]
+        if game.wild_suit == 0:
+            assert game.winner(game.in_play) == 0
+        elif game.wild_suit == 1:
+            assert game.winner(game.in_play) == 1
+        else:
+            assert game.winner(game.in_play) == 3
+
+        game.in_play = [Card(6, 0),
+                        Card(6, 1),
+                        Card(6, 0),
+                        Card(6, 2)]
+
+        assert game.winner(game.in_play) == 0
+
+def test_pacified_joker():
+    '''
+    This test ensures that pacified jokers (ნიჟე) are treated as 6s of the same suit.
+    '''
