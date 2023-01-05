@@ -6,7 +6,7 @@ def test_card_rank():
     assert Card(14, 0).rank() == 8
 
 def test_card_repr():
-    assert repr(Card(15, 0)) == "Joker"
+    assert repr(Card(16, 0)) == "Joker"
     assert repr(Card(6, 0)) == "Six of Diamonds"
     assert repr(Card(14, 0)) == "Ace of Diamonds"
 

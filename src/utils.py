@@ -14,7 +14,7 @@ def card_to_int(card: Card) -> int:
         return (card.value - 7) * 4 + (card.suit) + 2
 
 def int_to_card(card_index: int) -> Card:
-    if card_index == 36:
+    if card_index ==46:
         return None
     elif card_index < 2:
         return Card(6, card_index * 2)
@@ -98,7 +98,7 @@ def want_to_win(observation: OrderedDict):
         return False
 
 def first_to_play(observation: OrderedDict) -> bool:
-    if observation['in_play'][0] == 36:
+    if observation['in_play'][0] ==46:
         return True
     else:
         return False
@@ -135,7 +135,7 @@ def garunteed_win_with_jok(observation):
     '''
     Returns True if a player can garunteed by playing a joker
     '''
-    if observation["in_play"][-1] != 36:
+    if observation["in_play"][-1] != 46:
         return True
     elif observation["jokers_remaining"] == 1:
         return True
@@ -169,7 +169,7 @@ def choose_how_to_play_joker(observation):
         
 def cards_in_hand(observation):
     hand = observation["players"]["0"]["hand"]
-    return 9 - [card == 36 for card in hand].count(True)
+    return 9 - [card == 46 for card in hand].count(True)
 
 def obs_to_string(observation):
     obs_string = ""

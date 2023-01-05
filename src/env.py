@@ -1,6 +1,5 @@
 import gym
 from gym import spaces
-
 from src.game import Game
 
 class JokerEnv(gym.Env):

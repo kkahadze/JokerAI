@@ -7,6 +7,7 @@ class Card(object):
 
     def __repr__(self):
         values = {
+            5: lambda: "Joker (Take)", # Special card to indicate a Joker being played as Take/წაიგოს
             6: lambda: "Six",
             7: lambda: "Seven",
             8: lambda: "Eight",
@@ -16,7 +17,8 @@ class Card(object):
             12: lambda: "Queen",
             13: lambda: "King",
             14: lambda: "Ace",
-            15: lambda: "Joker",
+            15: lambda: "Joker (Highs)", # Special card to indicate a Joker being played as High/ვიში
+            16: lambda: "Joker",
         }
         suits = {
             0: lambda : "Diamonds",

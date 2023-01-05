@@ -124,7 +124,7 @@ class Game:
             if card_num < len(self.in_play):
                 in_play_ints.append(card_to_int(self.in_play[card_num]))
             else:
-                in_play_ints.append(36)
+                in_play_ints.append(46)
 
         return {
             "dealt": self.get_num_to_deal(),
@@ -196,9 +196,7 @@ class Game:
         else:
             transformed_joker = get_transformed_joker(cards)
             if transformed_joker:
-                # print(f"cards: {cards}")
                 indexes_of_indenticals = indexes_of_transformed_jokers(cards)
-                # print(f"indexes_of_indenticals: {indexes_of_indenticals}")
                 is_transformed_suit = [True if card.suit == cards[indexes_of_indenticals[0]].suit else False for card in cards]
                 if is_transformed_suit.count(True) == len(indexes_of_indenticals):
                     return indexes_of_indenticals[0]

@@ -50,6 +50,26 @@ def test_int_to_card():
         card = int_to_card(i)
         assert card_to_int(card) == i
 
+    # card = int_to_card(36)
+    # assert card.value == 15 and card.suit == 0
+
+    # card = int_to_card(37)
+    # assert card.value == 6 and card.suit == 0
+
+    # card = int_to_card(38)
+    # assert card.value == 5 and card.suit == 0
+
+    # card = int_to_card(39)
+    # assert card.value == 5 and card.suit == 1
+
+    # card = int_to_card(40)
+    # assert card.value == 5 and card.suit == 2
+
+    # card = int_to_card(41)
+    # assert card.value == 5 and card.suit == 3
+
+    
+
 def test_suit_count():
     hand = [Card(6, 0), Card(10, 3), Card(11, 1)]
     mapped_hand = map(lambda x : card_to_int(x), hand)
@@ -113,18 +133,18 @@ def test_want_to_win():
     assert not want_to_win(obs)
     
 def test_first_to_play():
-    obs = {"in_play": [36, 36, 36]}
+    obs = {"in_play": [46, 46, 46]}
     assert first_to_play(obs)
 
 def test_garunteed_win_with_jok():
     obs = {
-        "in_play": [13, 3, 36],
+        "in_play": [13, 3, 46],
         "jokers_remaining": 1
         }
     assert garunteed_win_with_jok(obs)
 
     obs = {
-        "in_play": [13, 3, 36],
+        "in_play": [13, 3, 46],
         "jokers_remaining": 0
     }
     assert not garunteed_win_with_jok(obs)
@@ -136,14 +156,14 @@ def test_garunteed_win_with_jok():
     assert garunteed_win_with_jok(obs)
     
     obs = {
-        "in_play": [13, 3, 36],
+        "in_play": [13, 3, 46],
         "jokers_remaining": 2,
     }
     assert not garunteed_win_with_jok(obs)
 
 def test_choose_how_to_play_joker():
     obs = {
-        "in_play": [13, 3, 36],
+        "in_play": [13, 3, 46],
         "jokers_remaining": 1,
         "players": {
             "0": {
@@ -159,7 +179,7 @@ def test_choose_how_to_play_joker():
     assert choose_how_to_play_joker(obs) == 8
 
     obs = {
-        "in_play": [36, 36, 36],
+        "in_play": [46, 46, 46],
         "jokers_remaining": 2,
         "players": {
             "0": {
@@ -177,7 +197,7 @@ def test_choose_how_to_play_joker():
     assert choose_how_to_play_joker(obs) == 5
 
     obs = {
-        "in_play": [36, 36, 36],
+        "in_play": [46, 46, 46],
         "jokers_remaining": 2,
         "players": {
             "0": {
@@ -204,7 +224,7 @@ def test_truncate_at_first_none():
 
 def test_obs_to_string():
     obs = {
-        "in_play": [13, 3, 36],
+        "in_play": [13, 3, 46],
         "jokers_remaining": 1,
         "players": {
             "0": {
@@ -232,7 +252,7 @@ def test_obs_to_string():
         
     }
 
-    assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Joker, Joker, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
+    assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Joker (Highs) of Clubs, Joker (Highs) of Diamonds, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
     
 
 def test_cards_in_hand():
@@ -264,33 +284,33 @@ def test_filter_by_suit_with_joks():
 
 def test_first_suit_exists():
     obs = {
-        "in_play": [36, 36, 36],
+        "in_play": [46, 46, 46],
     }
     assert not first_suit_exists(obs)
 
     obs = {
-        "in_play": [1, 36, 36],
+        "in_play": [1, 46, 46],
     }
     assert first_suit_exists(obs)
 
     obs = {
-        "in_play": [1, 2, 36],
+        "in_play": [1, 2, 46],
     }
     assert first_suit_exists(obs)
 
 def test_first_suit_index():
     obs = {
-        "in_play": [36, 36, 36],
+        "in_play": [46, 46, 46],
     }
     assert not first_suit_index(obs)
 
     obs = {
-        "in_play": [1, 36, 36],
+        "in_play": [1, 46, 46],
     }
     assert first_suit_index(obs) == 2
 
     obs = {
-        "in_play": [1, 2, 36],
+        "in_play": [1, 2, 46],
     }
     assert first_suit_index(obs) == 2
 
@@ -302,7 +322,7 @@ def test_first_suit_index():
 
 def test_playable():
     obs = {
-        "in_play": [36, 36, 36],
+        "in_play": [46, 46, 46],
         "jokers_remaining": 2,
         "players": {
             "0": {
@@ -320,7 +340,7 @@ def test_playable():
     assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
 
     obs = {
-        "in_play": [1, 36, 36],
+        "in_play": [1, 46, 46],
         "jokers_remaining": 2,
         "players": {
             "0": {
@@ -342,7 +362,7 @@ def test_playable():
         env = JokerEnv()
         obs = env.observation_space.sample()
         sample_hand = obs['players']['0']['hand'] # for printing the hand
-        if 36 not in sample_hand:
+        if 46 not in sample_hand:
             cur_playable = playable(obs)
             assert cur_playable
 

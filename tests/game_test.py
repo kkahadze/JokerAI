@@ -400,7 +400,3 @@ def test_second_card_wins():
 
         assert game.winner(game.in_play) == 0
 
-def test_pacified_joker():
-    '''
-    This test ensures that pacified jokers (ნიჟე) are treated as 6s of the same suit.
-    '''
