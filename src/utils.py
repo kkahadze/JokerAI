@@ -13,7 +13,7 @@ def card_to_int(card: Card) -> int:
     else:
         return (card.value - 7) * 4 + (card.suit) + 2
 
-def int_to_card(card_index: int) -> Card:
+def int_to_card(card_index: int, restricted_suits = None) -> Card:
     if card_index == 46:
         return None
     elif card_index < 2:
@@ -21,9 +21,21 @@ def int_to_card(card_index: int) -> Card:
     elif card_index == 34 or card_index == 35:
         return Card(15, card_index - 34)
     elif card_index == 36:
-        return Card(16, 0) # CHANGE
+        if not restricted_suits:
+            return Card(16, 0)
+        else:
+            suit = 0
+            while suit in restricted_suits:
+                suit += 1
+            return Card(16, suit)
     elif card_index == 37:
-        return Card(6, 3)  # CHANGE
+        if not restricted_suits:
+            return Card(6, 0)
+        else:
+            suit = 0
+            while suit in restricted_suits:
+                suit += 1
+            return Card(6, suit)
     elif card_index >= 38 and card_index <= 41:
         return Card(5, (card_index - 38))
     elif card_index >= 42 and card_index <= 45:
