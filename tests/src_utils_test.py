@@ -50,23 +50,39 @@ def test_int_to_card():
         card = int_to_card(i)
         assert card_to_int(card) == i
 
-    # card = int_to_card(36)
-    # assert card.value == 15 and card.suit == 0
+    # The suits that these two next card numbers become should change depending on the suits played in the given hand
+    card = int_to_card(36)
+    assert card.value == 16
 
-    # card = int_to_card(37)
-    # assert card.value == 6 and card.suit == 0
+    card = int_to_card(37)
+    assert card.value == 6 
 
-    # card = int_to_card(38)
-    # assert card.value == 5 and card.suit == 0
+    # Joker (Take)
+    card = int_to_card(38)
+    assert card.value == 5 and card.suit == 0
 
-    # card = int_to_card(39)
-    # assert card.value == 5 and card.suit == 1
+    card = int_to_card(39)
+    assert card.value == 5 and card.suit == 1
 
-    # card = int_to_card(40)
-    # assert card.value == 5 and card.suit == 2
+    card = int_to_card(40)
+    assert card.value == 5 and card.suit == 2
 
-    # card = int_to_card(41)
-    # assert card.value == 5 and card.suit == 3
+    card = int_to_card(41)
+    assert card.value == 5 and card.suit == 3
+
+    # Joker (Highest)
+    card = int_to_card(42)
+    assert card.value == 15 and card.suit == 0
+
+    card = int_to_card(43)
+    assert card.value == 15 and card.suit == 1
+
+    card = int_to_card(44)
+    assert card.value == 15 and card.suit == 2
+
+    card = int_to_card(45)
+    assert card.value == 15 and card.suit == 3
+
 
     
 
