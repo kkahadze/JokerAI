@@ -51,7 +51,8 @@ class JokerEnv(gym.Env):
                 # "streak": spaces.MultiBinary(4) # premia 
             }
         )
-
+        
+        # WRONG
         # Actions represent the card that a player chooses to play.
         # SUIT: DIAMONDS    CLUBS   HEARTS    SPADES
         # VALUES
