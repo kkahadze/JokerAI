@@ -10,7 +10,7 @@ class JokerEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 # all can be any card or no card (meaning that the current player is the first to play)
-                "in_play": spaces.MultiDiscrete([37, 37, 37]), # 0-36, 36 = no card
+                "in_play": spaces.MultiDiscrete([45, 45, 45]), # 0-43, 44 = no card
                 "wild_suit": spaces.Discrete(5), # 0-4, 4 = no wild suit
                 # "wild_value": spaces.Discrete(10), # 0-9
                 "players": spaces.Dict(
@@ -56,15 +56,26 @@ class JokerEnv(gym.Env):
         # Actions represent the card that a player chooses to play.
         # SUIT: DIAMONDS    CLUBS   HEARTS    SPADES
         # VALUES
-        # 6:        0         1       2         3
-        # 7:        4         5       6         7
-        # 8:        8         9       10        11
-        # 9:        12        13      14        15
-        # 10:       16        17      18        19
-        # JACK:     20        21      22        23
-        # QUEEN:    24        25      26        27
-        # KING:     28        29      30        31
-        # ACE:      32        33      34        35
+        # 6:        0                 1         
+        # 7:        2         3       4         5
+        # 8:        6         7       8         9
+        # 9:        10        11      12        13
+        # 10:       14        15      16        17
+        # JACK:     18        19      20        21
+        # QUEEN:    22        23      24        25
+        # KING:     26        27      28        29
+        # ACE:      30        31      32        33
+        
+        # Joker Regular:          34
+        # Joker Nizhe:            35
+                                    
+        #                          SUIT:     DIAMONDS    CLUBS   HEARTS    SPADES
+        #             Values:              
+        # Joker Take(წაიღოს):                  36        37      38        39       
+        # Joker Highest(ვიში):                 40        41      42        43
+                                    
+
+
         self.action_space = spaces.Discrete(44)
 
 
