@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit, index_of_latest_joker, indexes_of_transformed_jokers, get_transformed_joker
+from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit, index_of_latest_base_joker, indexes_of_transformed_jokers, get_transformed_joker
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -65,7 +65,7 @@ class Game:
         # self.gone = [0 for i in range(36)]
 
     def step(self, action):
-        self.add_play(action)
+        self.player_0_play(action, first=self.first_to_play == 0)
         self.pre_plays()
         self.process_hand_results()
 
@@ -113,7 +113,7 @@ class Game:
         if self.deck:
             wild_card = self.deck[0]
             self.wild_card = wild_card
-            if wild_card.value != 15:
+            if wild_card.value != 16:
                 self.wild_suit = wild_card.suit
             else:
                 self.wild_suit = 4
@@ -162,17 +162,9 @@ class Game:
     def get_plays(self, players):
         for player_num in players:
             choice = self.ask_to_play(player_num)
-            action = card_to_int(choice)
             if player_num == self.first_to_play:
-                self.add_play(action, first=True)
-            else:
-                self.add_play(action)
-
-    def add_play(self, play, first=False):
-        card = int_to_card(play)
-        if first:
-            self.first_suit = card.suit
-        self.in_play.append(card)
+                self.first_suit = choice.suit
+            self.in_play.append(choice)
 
     def ask_to_play(self, player_num):
         return self.players[player_num].play(self.to_obs())
@@ -191,8 +183,10 @@ class Game:
         wildsuit = self.wild_suit
         first_suit = cards[0].suit
 
-        if 15 in [card.value for card in cards]: # joker was played
-            return index_of_latest_joker(cards)
+        if 16 in [card.value for card in cards]: # joker was played
+            return index_of_latest_base_joker(cards)
+        elif 15 in [card.value for card in cards]: # joker (vishi) was played
+            return 0
         else:
             transformed_joker = get_transformed_joker(cards)
             if transformed_joker:
@@ -216,6 +210,12 @@ class Game:
 
     def is_done(self):
         return self.done
+
+    def player_0_play(self, play, first):
+        card = int_to_card(play)
+        if first:
+            self.first_suit = card.suit
+        self.in_play.append(card)
 
     def print_game(self):
         obs = self.to_obs()

@@ -8,38 +8,36 @@ def additional_hands_desired(observation):
 def card_to_int(card: Card) -> int:
     if card.value == 6:
         return card.suit // 2 # 0 if Diamonds, 1 if Heart
+    elif card.value == 16:
+        return 34  # 34 if red, 35 if black
+    elif card.value == 5:
+        return 35
     elif card.value == 15:
-        return 34 + card.suit # 34 if red, 35 if black
+        return card.suit + 40
     else:
         return (card.value - 7) * 4 + (card.suit) + 2
 
 def int_to_card(card_index: int, restricted_suits = None) -> Card:
-    if card_index == 46:
+    if card_index > 43:
         return None
     elif card_index < 2:
         return Card(6, card_index * 2)
-    elif card_index == 34 or card_index == 35:
-        return Card(15, card_index - 34)
-    elif card_index == 36:
-        if not restricted_suits:
-            return Card(16, 0)
+    elif card_index == 34:
+        if restricted_suits:
+            suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
         else:
-            suit = 0
-            while suit in restricted_suits:
-                suit += 1
-            return Card(16, suit)
-    elif card_index == 37:
-        if not restricted_suits:
-            return Card(6, 0)
+            suit = random.choice(range(4))
+        return Card(16, suit)
+    elif card_index == 35:
+        if restricted_suits:
+            suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
         else:
-            suit = 0
-            while suit in restricted_suits:
-                suit += 1
-            return Card(6, suit)
-    elif card_index >= 38 and card_index <= 41:
-        return Card(5, (card_index - 38))
-    elif card_index >= 42 and card_index <= 45:
-        return Card(15, (card_index - 42))
+            suit = random.choice(range(4))
+        return Card(5, suit)
+    elif card_index >= 36 and card_index <= 39:
+        return Card(5, (card_index - 36))
+    elif card_index >= 40 and card_index <= 43:
+        return Card(15, (card_index - 40))
     else:
         return Card((card_index - 2) // 4 + 7, (card_index - 2) % 4)
 
@@ -274,7 +272,7 @@ def filter_by_suit_with_joks(cards: list, suit: str):
     '''
     Filters the cards inputted to only include cards of the given suit and jokers
     '''
-    return list(filter(lambda card: card.suit == suit or card.value == 15, cards))
+    return list(filter(lambda card: card.suit == suit or card.value == 16 or card.value == 15 or card.value == 5, cards))
 
 def filter_by_suit_without_joks(cards: list, suit: str):
     '''
@@ -367,12 +365,11 @@ def index_of_highest_of_suit(cards, suit):
     else:
         return None
 
-def index_of_latest_joker(cards):
+def index_of_latest_base_joker(cards):
     index = -1
     for i, card in enumerate(cards):
-        if card.value == 15:
+        if card.value == 16:
             index = i
-
     return index
 
 def get_transformed_joker(cards):

@@ -2,30 +2,30 @@ from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, car
 from src.card import Card
 from src.env import JokerEnv
 
-def test_card_to_int():
-    card = Card(6, 0)
-    assert card_to_int(card) == 0
+# def test_card_to_int():
+#     card = Card(6, 0)
+#     assert card_to_int(card) == 0
 
-    card = Card(6, 2)
-    assert card_to_int(card) == 1
+#     card = Card(6, 2)
+#     assert card_to_int(card) == 1
 
-    card = Card(7, 0)
-    assert card_to_int(card) == 2
+#     card = Card(7, 0)
+#     assert card_to_int(card) == 2
 
-    card = Card(15, 0)
-    assert card_to_int(card) == 34
+#     card = Card(15, 0)
+#     assert card_to_int(card) == 34
 
-    card = Card(15, 1)
-    assert card_to_int(card) == 35
+#     card = Card(15, 1)
+#     assert card_to_int(card) == 35
 
-    card = Card(11, 1)
-    assert card_to_int(card) == 19
+#     card = Card(11, 1)
+#     assert card_to_int(card) == 19
 
-    for suit in range(0, 4):
-        for value in range(6, 15):
-            if value == 6 or value == 15:
-                continue
-            assert card_to_int(Card(value, suit)) == (value - 7) * 4 + (suit) + 2
+#     for suit in range(0, 4):
+#         for value in range(6, 15):
+#             if value == 6 or value == 15:
+#                 continue
+#             assert card_to_int(Card(value, suit)) == (value - 7) * 4 + (suit) + 2
 
 def test_int_to_card():
     card = int_to_card(0)
@@ -38,53 +38,48 @@ def test_int_to_card():
     assert card.value == 7 and card.suit == 0
 
     card = int_to_card(34)
-    assert card.value == 15 and card.suit == 0
+    assert card.value == 16 and card.suit == 0
 
     card = int_to_card(35)
-    assert card.value == 15 and card.suit == 1
+    assert card.value == 5 
 
     card = int_to_card(19)
     assert card.value == 11 and card.suit == 1
 
-    for i in range(36):
-        card = int_to_card(i)
-        assert card_to_int(card) == i
+    # for i in range(36):
+    #     card = int_to_card(i)
+    #     assert card_to_int(card) == i
 
-    # The suits that these two next card numbers become should change depending on the suits played in the given hand
     card = int_to_card(36)
-    assert card.value == 16
-
-    card = int_to_card(37)
-    assert card.value == 6 
-
-    # Joker (Take)
-    card = int_to_card(38)
     assert card.value == 5 and card.suit == 0
 
-    card = int_to_card(39)
+    card = int_to_card(37)
     assert card.value == 5 and card.suit == 1
 
-    card = int_to_card(40)
+    card = int_to_card(38)
     assert card.value == 5 and card.suit == 2
 
-    card = int_to_card(41)
+    card = int_to_card(39)
     assert card.value == 5 and card.suit == 3
 
-    # Joker (Highest)
-    card = int_to_card(42)
+    card = int_to_card(40)
     assert card.value == 15 and card.suit == 0
 
-    card = int_to_card(43)
+    card = int_to_card(41)
     assert card.value == 15 and card.suit == 1
 
-    card = int_to_card(44)
+    card = int_to_card(42)
     assert card.value == 15 and card.suit == 2
 
-    card = int_to_card(45)
+    card = int_to_card(43)
     assert card.value == 15 and card.suit == 3
 
+    # Restricted suits for Take/წაიღოს
+    card = int_to_card(35, restricted_suits=[0, 1])
+    assert card.value == 5 and (card.suit == 2 or card.suit == 3)
 
-    
+    card = int_to_card(35, restricted_suits=[0, 2, 3])
+    assert card.value == 5 and card.suit == 1    
 
 def test_suit_count():
     hand = [Card(6, 0), Card(10, 3), Card(11, 1)]

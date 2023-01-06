@@ -50,9 +50,10 @@ class RandomCallerRandomPlayer(Player):
         first_to_play = observation["first_to_play"]
         
         opp_playable = []
+        adjusted_hand = adjust_for_order(self.hand, first_to_play == self.number)
 
         if self.number == first_to_play or len(self.hand) == 1:
-            opp_playable = self.hand
+            opp_playable = adjusted_hand
         
         else:
             if first_suit != 4:
@@ -86,3 +87,23 @@ class RandomCallerRandomPlayer(Player):
             if card.suit == suit:
                 return True
         return False
+
+def adjust_for_order(hand, first):
+    playable_hand = []
+    if first:
+        for card in hand:
+            if card.value == 16:
+                for i in range(4):
+                    playable_hand.append(15, i)
+                    playable_hand.append(5, i)
+            else:
+                playable_hand.append(card)
+    else:
+        for card in hand:
+            if card.value == 16:
+                playable_hand.append(5, 0)
+                playable_hand.append(16, 0)
+            else:
+                playable_hand.append(card)
+
+    return playable_hand

@@ -130,10 +130,7 @@ def test_reset_play():
     #  empty list and resets the first suit
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
     game.reset()
-    action = 1
-    card = int_to_card(action)
-    game.add_play(card_to_int(card))
-
+    game.player_0_play(1, first=game.first_to_play == 0)
         
     game.pre_plays()
 
@@ -145,24 +142,23 @@ def test_reset_play():
     assert game.in_play == []
     assert game.first_suit == 4
 
-def test_add_play():
-    # This function tests the add_play() function in game.py to assure that it adds the correct card to the in_play list
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-    game.reset_vars()
-    game.deal()
-    game.first_to_play = 0
-    choice = random.choice(game.players[0].hand)
-    game.add_play(card_to_int(choice), first=True)
-    assert choice in game.in_play
-    assert game.first_suit == choice.suit
+# def test_add_play():
+#     # This function tests the add_play() function in game.py to assure that it adds the correct card to the in_play list
+#     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
+#     game.reset_vars()
+#     game.deal()
+#     game.first_to_play = 0
+#     choice = random.choice(game.players[0].hand)
+#     game.add_play(card_to_int(choice), first=True)
+#     assert choice in game.in_play
+#     assert game.first_suit == choice.suit
 
 def test_is_done():
     # This function tests the is_done() function in game.py to assure that it returns True when the game is done and False when it is not
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
     game.reset_vars()
     game.deal()
-    card_int = random.choice(game.players[game.first_to_play].hand)
-    game.add_play(card_to_int(card_int), first=True)
+    game.step(1)
     assert game.is_done() == False
 
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
@@ -192,8 +188,12 @@ def test_winner():
     assert game.winner([Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]) == 1
     assert game.winner([Card(6, 3), Card(7, 3), Card(6, 2), Card(9, 1)]) == 1
     assert game.winner([Card(6, 3), Card(7, 3), Card(6, 0), Card(9, 2)]) == 2
-    assert game.winner([Card(6, 0), Card(7, 0), Card(15, 1), Card(15, 0)]) == 3
-    assert game.winner([Card(12, 3), Card(7, 1), Card(15, 2), Card(9, 1)]) == 2
+    assert game.winner([Card(6, 0), Card(7, 0), Card(16, 1), Card(16, 0)]) == 3
+    assert game.winner([Card(12, 3), Card(7, 1), Card(16, 2), Card(9, 1)]) == 2
+    
+    assert game.winner([Card(15, 3), Card(16, 1), Card(16, 2), Card(9, 0)]) == 2
+    assert game.winner([Card(5, 3), Card(6, 3), Card(12, 2), Card(9, 0)]) == 3
+    assert game.winner([Card(15, 3), Card(16, 1), Card(12, 2), Card(9, 0)]) == 1
 
 def test_update_takes():
     game = Game()
@@ -355,19 +355,19 @@ def test_second_card_wins():
         game.in_play = [Card(6, 0), # Transformed Joker
                         Card(7, 3), 
                         Card(6, 0), # Non-Joker 6
-                        Card(15, 2)] # Joker
+                        Card(16, 2)] # Joker
         assert game.winner(game.in_play) == 3
 
         game.in_play = [Card(6, 1), # Transformed Joker
                         Card(7, 1), 
                         Card(6, 0), 
-                        Card(15, 2)] # Joker
+                        Card(16, 2)] # Joker
         assert game.winner(game.in_play) == 3
 
         game.in_play = [Card(15, 2), # Joker
                         Card(7, 1), 
                         Card(6, 0), 
-                        Card(15, 2)] # Joker
+                        Card(16, 2)] # Joker
         assert game.winner(game.in_play) == 3
 
         game.in_play = [Card(15, 2), # Joker
