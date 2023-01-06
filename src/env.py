@@ -19,25 +19,25 @@ class JokerEnv(gym.Env):
                             {
                                 # the first one is 36 since the player must have at least one card in possesion when taking an action
                                 "hand": spaces.MultiDiscrete([36, 37, 37, 37, 37, 37, 37, 37, 37]), 
-                                "desired": spaces.Discrete(11), # -1 - 9
+                                "desired": spaces.Discrete(11), # 0 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
                         "1": spaces.Dict(
                             {
-                                "desired": spaces.Discrete(11), # -1 - 9
+                                "desired": spaces.Discrete(11), # 0 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
                         "2": spaces.Dict(
                             {
-                                "desired": spaces.Discrete(11), # -1 - 9
+                                "desired": spaces.Discrete(11), # 0 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
                         "3": spaces.Dict(
                             {
-                                "desired": spaces.Discrete(11), # -1 - 9
+                                "desired": spaces.Discrete(11), # 0 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
                         ),
@@ -64,7 +64,7 @@ class JokerEnv(gym.Env):
         # QUEEN:    24        25      26        27
         # KING:     28        29      30        31
         # ACE:      32        33      34        35
-        self.action_space = spaces.Discrete(36)
+        self.action_space = spaces.Discrete(44)
 
 
     def step(self, action):
@@ -74,7 +74,7 @@ class JokerEnv(gym.Env):
     def reset(self):
         # Reset the state of the environment to an initial state
         self.game = Game()
-        self.observation_space['in_play'] = [36, 36, 36]
+        self.observation_space['in_play'] = [44, 44, 44]
         self.observation_space['wild_suit'] = 4
 
         self.observation_space['players']['0']['hand'] = self.game.players[0].hand

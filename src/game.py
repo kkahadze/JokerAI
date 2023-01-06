@@ -124,7 +124,7 @@ class Game:
             if card_num < len(self.in_play):
                 in_play_ints.append(card_to_int(self.in_play[card_num]))
             else:
-                in_play_ints.append(46)
+                in_play_ints.append(44)
 
         return {
             "dealt": self.get_num_to_deal(),

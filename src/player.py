@@ -1,3 +1,5 @@
+from src.utils import card_to_int
+
 class Player():
     def __init__(self, number_in):
         self.number = number_in
@@ -42,3 +44,12 @@ class Player():
         self.desired = -1
         self.taken = 0
         self.hand = []
+
+    def hand_to_obs(self):
+        return [card_to_int(card) for card in self.hand]
+
+    def desired_to_obs(self):
+        return self.desired
+    
+    def taken_to_obs(self):
+        return self.taken

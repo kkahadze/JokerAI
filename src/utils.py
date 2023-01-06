@@ -5,13 +5,16 @@ import random
 def additional_hands_desired(observation):
     return observation['players']['0']['desired'] - observation['players']['0']['taken']
 
-def card_to_int(card: Card) -> int:
+def card_to_int(card: Card, first=False) -> int:
     if card.value == 6:
         return card.suit // 2 # 0 if Diamonds, 1 if Heart
     elif card.value == 16:
         return 34  # 34 if red, 35 if black
     elif card.value == 5:
-        return 35
+        if first:
+            return 36 + card.suit
+        else:
+            return 35
     elif card.value == 15:
         return card.suit + 40
     else:
