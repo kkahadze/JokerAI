@@ -18,7 +18,7 @@ class JokerEnv(gym.Env):
                         "0": spaces.Dict(
                             {
                                 # the first one is 36 since the player must have at least one card in possesion when taking an action
-                                "hand": spaces.MultiDiscrete([36, 37, 37, 37, 37, 37, 37, 37, 37]), 
+                                "hand": spaces.MultiDiscrete([35, 36, 36, 36, 36, 36, 36, 36, 36]), 
                                 "desired": spaces.Discrete(11), # 0 - 9
                                 "taken": spaces.Discrete(10), # 0-9
                             }        
