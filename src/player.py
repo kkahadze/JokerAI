@@ -46,7 +46,7 @@ class Player():
         self.hand = []
 
     def hand_to_obs(self):
-        return [card_to_int(card) for card in self.hand]
+        return card_to_int(self.hand)
 
     def desired_to_obs(self):
         return self.desired

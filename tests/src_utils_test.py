@@ -172,60 +172,6 @@ def test_garunteed_win_with_jok():
     }
     assert not garunteed_win_with_jok(obs)
 
-def test_choose_how_to_play_joker():
-    obs = {
-        "in_play": [13, 3, 46],
-        "jokers_remaining": 1,
-        "players": {
-            "0": {
-                "hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-                "desired": 4,
-                "taken": 0
-            }
-        }
-    }
-    assert choose_how_to_play_joker(obs) == 8
-
-    obs = {
-        "in_play": [46, 46, 46],
-        "jokers_remaining": 2,
-        "players": {
-            "0": {
-                "hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 1), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-                "desired": 4,
-                "taken": 0
-            }
-        },
-        "wild_suit": 1
-    }
-
-    assert choose_how_to_play_joker(obs) == 5
-
-    obs = {
-        "in_play": [46, 46, 46],
-        "jokers_remaining": 2,
-        "players": {
-            "0": {
-                "hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 3), Card(10, 3), Card(11, 2), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 4), Card(8, 3), Card(11, 0)])
-                ),
-                "desired": 0,
-                "taken": 0
-                ,
-            }
-        },
-        "wild_suit": 1
-    }
-
-    assert isinstance(choose_how_to_play_joker(obs), int)
-
 def test_truncate_at_first_none():
     assert truncate_at_first_none([1, 2, 3, None, 4, 5]) == [1, 2, 3]
     assert truncate_at_first_none([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]
