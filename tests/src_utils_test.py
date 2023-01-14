@@ -1,4 +1,4 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_how_to_play_joker, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit_with_joks, first_suit_exists, first_suit_index, playable, contains_suit, highest_of_suit, get_transformed_joker, indexes_of_transformed_jokers
+from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit_with_joks, first_suit_exists, first_suit_index, playable, contains_suit, highest_of_suit, get_transformed_joker, indexes_of_transformed_jokers
 from src.card import Card
 from src.env import JokerEnv
 
@@ -349,5 +349,3 @@ def test_contains_transformed_joker():
     ]
     assert get_transformed_joker(cards)
 
-
-    

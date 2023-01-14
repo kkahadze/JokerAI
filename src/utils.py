@@ -119,7 +119,7 @@ def want_to_win(observation: OrderedDict):
         return False
 
 def first_to_play(observation: OrderedDict) -> bool:
-    if observation['in_play'][0] == 44:
+    if observation['in_play'][0] == 46:
         return True
     else:
         return False
@@ -155,8 +155,8 @@ def choose_suit_for_take(observation):
 def garunteed_win_with_jok(observation):
     '''
     Returns True if a player can garunteed by playing a joker
-    '''
-    if observation["in_play"][-1] != 44:
+`    '''
+    if observation["in_play"][-1] != 46:
         return True
     elif observation["jokers_remaining"] == 1:
         return True
