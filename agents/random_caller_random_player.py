@@ -44,7 +44,6 @@ class RandomCallerRandomPlayer(Player):
             }
     
     def opp_playable(self, observation):
-        print("_________________")
         wild_suit = observation["wild_suit"]
         first_suit = observation["first_suit"]
         first_to_play = observation["first_to_play"]

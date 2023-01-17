@@ -1,6 +1,7 @@
 import gym
 from gym import spaces
 from src.game import Game
+import numpy as np
 
 class JokerEnv(gym.Env):
     metadata = {}
@@ -10,7 +11,7 @@ class JokerEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 # all can be any card or no card (meaning that the current player is the first to play)
-                "in_play": spaces.MultiDiscrete([45, 45, 45]), # 0-43, 44 = no card
+                "in_play": spaces.MultiDiscrete([47, 47, 47]), # 0-43, 44 = no card
                 "wild_suit": spaces.Discrete(5), # 0-4, 4 = no wild suit
                 # "wild_value": spaces.Discrete(10), # 0-9
                 "players": spaces.Dict(
@@ -45,7 +46,7 @@ class JokerEnv(gym.Env):
                     }
                 ),
                 "jokers_remaining": spaces.Discrete(3), # 0-2
-                "dealt": spaces.Discrete(9), # 0-1
+                "dealt": spaces.Discrete(10), # 0-9
                 # "gone": spaces.MultiBinary(36)
                 # "scores": spaces.MultiDiscrete([10, 10, 10, 10]), # others scores (who does it benefit to hurt)
                 # "streak": spaces.MultiBinary(4) # premia 
@@ -73,33 +74,19 @@ class JokerEnv(gym.Env):
         #             Values:              
         # Joker Take(წაიღოს):                  36        37      38        39       
         # Joker Highest(ვიში):                 40        41      42        43
-                                    
-
-
+        
         self.action_space = spaces.Discrete(44)
-
 
     def step(self, action):
         # Execute one time step within the environment
-        pass
+        self.game.step(action)
+        obs = self.game.to_obs()
+        reward = 1 if self.game.highest_score_player() == 0 else 0
+        done = self.game.round == 5
+        return obs, reward, self.game.done, {}
 
     def reset(self):
         # Reset the state of the environment to an initial state
         self.game = Game()
-        self.observation_space['in_play'] = [44, 44, 44]
-        self.observation_space['wild_suit'] = 4
-
-        self.observation_space['players']['0']['hand'] = self.game.players[0].hand
-        self.observation_space['players']['0']['desired'] = self.game.players[0].desired
-        self.observation_space['players']['0']['taken'] = self.game.players[0].taken
-
-        self.observation_space['players']['1']['desired'] = self.game.players[1].desired
-        self.observation_space['players']['1']['taken'] = self.game.players[1].taken
-
-        self.observation_space['players']['2']['desired'] = self.game.players[2].desired
-        self.observation_space['players']['2']['taken'] = self.game.players[2].taken
-
-        self.observation_space['players']['3']['desired'] = self.game.players[3].desired
-        self.observation_space['players']['3']['taken'] = self.game.players[3].taken
-
-        self.observation_space['jokers_remaining'] = 2
+        self.game.reset()
+        return self.game.to_obs()

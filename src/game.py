@@ -10,6 +10,7 @@ class Game:
         self.player_types = [type(player) for player in players_in]
 
         if only_nines:
+            self.only_nines = True
             self.deal_amounts = [
                 [9, 9, 9, 9],
                 [9, 9, 9, 9],
@@ -17,6 +18,7 @@ class Game:
                 [9, 9, 9, 9],
             ]
         else:
+            self.only_nines = False
             self.deal_amounts = [
                 [1, 2, 3, 4, 5, 6, 7, 8],
                 [9, 9, 9, 9],
@@ -68,15 +70,14 @@ class Game:
         self.player_0_play(action, first=self.first_to_play == 0)
         self.pre_plays()
         self.process_hand_results()
-
-        if self.is_done():
-            return
         
-        if self.hand_empty():
+        if self.hand_empty() and self.get_num_to_deal():
             self.new_hand()
         
         if not self.done:
             self.post_plays()
+        else:
+            self.done = True
 
     def pre_plays(self):
         if self.first_to_play != 1:
@@ -89,7 +90,12 @@ class Game:
             self.get_plays(rest_of_players)
 
     def get_num_to_deal(self):
-        return self.deal_amounts[self.round - 1][self.play - 1]
+        if self.round == 5 or self.round == 4 and self.play > 4:
+            return None
+        else:
+            # print(f"Round: {self.round}, Play: {self.play}")
+            # print(f"Deal amounts: {self.deal_amounts[self.round - 1]}")
+            return self.deal_amounts[self.round - 1][self.play - 1]
 
     def new_hand(self):
         self.update_score()
@@ -97,6 +103,8 @@ class Game:
         if not self.done:
             self.deal()
             self.get_calls()
+        else:
+            self.done = True
 
     def update_score(self):
         for player in self.players:
@@ -250,3 +258,10 @@ class Game:
             print("Calls: " + str(player["desired"]))
             print("Takes: " + str(player["taken"]))
         print("In play: " + str(self.in_play))
+
+    def highest_score_player(self):
+        max_player = 0
+        for i in range(1, 4):
+            if self.players[i].score > self.players[max_player].score:
+                max_player = i
+        return max_player

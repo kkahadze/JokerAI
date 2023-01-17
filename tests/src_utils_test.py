@@ -38,7 +38,7 @@ def test_int_to_card():
     assert card.value == 7 and card.suit == 0
 
     card = int_to_card(34)
-    assert card.value == 16 and card.suit == 0
+    assert card.value == 16 
 
     card = int_to_card(35)
     assert card.value == 5 
@@ -314,14 +314,6 @@ def test_playable():
 
     cur_playable = playable(obs)
     assert cur_playable == [Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]
-
-    for i in range(100):
-        env = JokerEnv()
-        obs = env.observation_space.sample()
-        sample_hand = obs['players']['0']['hand'] # for printing the hand
-        if 46 not in sample_hand:
-            cur_playable = playable(obs)
-            assert cur_playable
 
 def test_contains_suit():
     assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])

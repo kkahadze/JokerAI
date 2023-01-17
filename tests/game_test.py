@@ -400,3 +400,10 @@ def test_second_card_wins():
 
         assert game.winner(game.in_play) == 0
 
+def test_game_until_done():
+    game = Game()
+    game.reset()
+    while not game.done:
+        game.step(card_to_int(game.players[0].play(game.to_obs())))
+    assert game.is_done()
+    
