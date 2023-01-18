@@ -14,37 +14,19 @@ class JokerEnv(gym.Env):
                 "in_play": spaces.MultiDiscrete([47, 47, 47]), # 0-43, 44 = no card
                 "wild_suit": spaces.Discrete(5), # 0-4, 4 = no wild suit
                 # "wild_value": spaces.Discrete(10), # 0-9
-                "players": spaces.Dict(
-                    {
-                        "0": spaces.Dict(
-                            {
-                                # the first one is 36 since the player must have at least one card in possesion when taking an action
-                                "hand": spaces.MultiDiscrete([35, 36, 36, 36, 36, 36, 36, 36, 36]), 
-                                "desired": spaces.Discrete(11), # 0 - 9
-                                "taken": spaces.Discrete(10), # 0-9
-                            }        
-                        ),
-                        "1": spaces.Dict(
-                            {
-                                "desired": spaces.Discrete(11), # 0 - 9
-                                "taken": spaces.Discrete(10), # 0-9
-                            }        
-                        ),
-                        "2": spaces.Dict(
-                            {
-                                "desired": spaces.Discrete(11), # 0 - 9
-                                "taken": spaces.Discrete(10), # 0-9
-                            }        
-                        ),
-                        "3": spaces.Dict(
-                            {
-                                "desired": spaces.Discrete(11), # 0 - 9
-                                "taken": spaces.Discrete(10), # 0-9
-                            }        
-                        ),
-                        
-                    }
-                ),
+                "player0hand": spaces.MultiDiscrete([35, 36, 36, 36, 36, 36, 36, 36, 36]), # 0-35, 36 = no card
+                "player0desired": spaces.Discrete(11), # 0 - 9
+                "player0taken": spaces.Discrete(10), # 0-9
+
+                "player1taken": spaces.Discrete(10), # 0-9
+                "player1desired": spaces.Discrete(11), # 0 - 9
+
+                "player2taken": spaces.Discrete(10), # 0-9
+                "player2desired": spaces.Discrete(11), # 0 - 9
+
+                "player3taken": spaces.Discrete(10), # 0-9
+                "player3desired": spaces.Discrete(11), # 0 - 9
+
                 "jokers_remaining": spaces.Discrete(3), # 0-2
                 "dealt": spaces.Discrete(10), # 0-9
                 # "gone": spaces.MultiBinary(36)

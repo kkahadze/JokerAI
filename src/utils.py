@@ -3,7 +3,7 @@ from collections import OrderedDict
 import random
 
 def additional_hands_desired(observation):
-    return observation['players']['0']['desired'] - observation['players']['0']['taken']
+    return observation['player0desired'] - observation['player0taken']
 
 def card_to_int(card: Card, first=False) -> int:
     if card.value == 6:
@@ -81,7 +81,7 @@ def suit_count(cards) -> tuple:
     return diamonds, clubs, hearts, spades
 
 def least_common_suit_in_hand(observation: OrderedDict) -> int:
-    diamonds, clubs, hearts, spades = suit_count(observation['players']['0']['hand'])
+    diamonds, clubs, hearts, spades = suit_count(observation['player0hand'])
 
     if diamonds <= clubs and diamonds <= hearts and diamonds <= spades:
         return 0
@@ -93,7 +93,7 @@ def least_common_suit_in_hand(observation: OrderedDict) -> int:
         return 3
 
 def most_common_suit_in_hand(observation: OrderedDict) -> int:
-    diamonds, clubs, hearts, spades = suit_count(observation['players']['0']['hand'])
+    diamonds, clubs, hearts, spades = suit_count(observation['player0hand'])
 
     if diamonds >= clubs and diamonds >= hearts and diamonds >= spades:
         return 0
@@ -106,14 +106,14 @@ def most_common_suit_in_hand(observation: OrderedDict) -> int:
 
 def wildsuit_count(observation: OrderedDict) -> int:
     wildsuit = observation['wild_suit']
-    return suit_count(observation['players']['0']['hand'])[wildsuit]
+    return suit_count(observation['player0hand'])[wildsuit]
 
 def want_to_win(observation: OrderedDict):
     '''
     This should eventually be learned by our model but a rule based approach will do for now.
     This rule based approach returns True if the player wants to win, and False if they want to take
     '''
-    if observation['players']['0']['desired'] != observation['players']['0']['taken']:
+    if observation['player0desired'] != observation['player0taken']:
         return True
     else:
         return False
@@ -143,7 +143,7 @@ def choose_suit_for_take(observation):
     This should also eventually be learned, or better yet completely based on what cards have gone.
     '''
     most_common_suit = most_common_suit_in_hand(observation)
-    diamonds, clubs, hearts, spades = suit_count(observation['players']['0']['hand'])
+    diamonds, clubs, hearts, spades = suit_count(observation['player0hand'])
     counts = [diamonds, clubs, hearts, spades]
     common_count = counts[most_common_suit]
 
@@ -167,7 +167,7 @@ def beatable_obs(observation):
     return False
         
 def cards_in_hand(observation):
-    hand = observation["players"]["0"]["hand"]
+    hand = observation["player0hand"]
     return 9 - [card == 44 for card in hand].count(True)
 
 def obs_to_string(observation):
@@ -175,10 +175,10 @@ def obs_to_string(observation):
 
     card_ints = observation["in_play"]
     wildsuit = observation["wild_suit"]
-    hand0_ints, desired0, taken0 = observation["players"]["0"]["hand"], observation["players"]["0"]["desired"], observation["players"]["0"]["taken"]
-    desired1, taken1 = observation["players"]["1"]["desired"], observation["players"]["1"]["taken"]
-    desired2, taken2 = observation["players"]["2"]["desired"], observation["players"]["2"]["taken"]
-    desired3, taken3 = observation["players"]["3"]["desired"], observation["players"]["3"]["taken"]
+    hand0_ints, desired0, taken0 = observation["player0hand"], observation["player0desired"], observation["player0taken"]
+    desired1, taken1 = observation["player1desired"], observation["player1taken"]
+    desired2, taken2 = observation["player2desired"], observation["player2taken"]
+    desired3, taken3 = observation["player3desired"], observation["player3taken"]
     jokers_remaining = observation["jokers_remaining"]
 
     cards = list(map(lambda card_int: int_to_card(card_int), card_ints))
@@ -221,7 +221,7 @@ def truncate_at_first_none(cards: list):
     return cards
 
 def playable(observation): # Returns a list of cards that can be played, accounting for jokers
-    hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"])))
+    hand = truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["player0hand"])))
 
     if cards_in_hand(observation) == 1:
         return [hand[0]]
@@ -303,7 +303,7 @@ def has_first_suit(observation):
     '''
     Returns True if Player 0's hand contains the first suit
     '''
-    return contains_suit(first_suit_index(observation), truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["players"]["0"]["hand"]))))
+    return contains_suit(first_suit_index(observation), truncate_at_first_none(list(map(lambda card_int: int_to_card(card_int), observation["player0hand"]))))
 
 def have_wild_suit(observation, number = 0, cards = []):
     '''
@@ -311,7 +311,7 @@ def have_wild_suit(observation, number = 0, cards = []):
     '''
     wildsuit = get_wildsuit(observation)
     if number == 0:
-        player_cards = observation["players"]["0"]["hand"]
+        player_cards = observation["player0hand"]
         wildsuit_cards = list(filter(lambda card_int: card_int == wildsuit, player_cards))
         truncated_wild_ints = truncate_at_first_none(wildsuit_cards)
         truncated_wilds = list(map(lambda card_int: int_to_card(card_int), truncated_wild_ints))

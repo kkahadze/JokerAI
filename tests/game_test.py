@@ -12,19 +12,13 @@ def test_init():
     assert game.players[0].number == 0 and game.players[1].number == 1 and game.players[2].number == 2 and game.players[3].number == 3
     assert game.players[0].hand is not None and game.players[1].hand is not None and game.players[2].hand is not None and game.players[3].hand is not None
 
-    game = Game([Player(6), Player(7), Player(8), Player(9)])
-    assert game is not None
-    assert game.players[0].number == 6 and game.players[1].number == 7 and game.players[2].number == 8 and game.players[3].number == 9
-    assert game.players[0].hand is not None and game.players[1].hand is not None and game.players[2].hand is not None and game.players[3].hand is not None
-
 def test_reset_vars():
     # The following test makes sure that reset_vars() 
     # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play
 
-    game = Game([Player(6), Player(7), Player(8), Player(9)])
+    game = Game([Player(0), Player(1), Player(2), Player(3)])
     game.reset_vars()
     assert game is not None
-    assert game.players[0].number == 6 and game.players[1].number == 7 and game.players[2].number == 8 and game.players[3].number == 9
     assert game.players[0].hand is not None and game.players[1].hand is not None and game.players[2].hand is not None and game.players[3].hand is not None
     assert game.round == 1
     assert game.play == 1
@@ -244,7 +238,7 @@ def test_get_num_to_deal():
     assert game.get_num_to_deal() == 9
 
 def test_game_reset():
-    game = Game([RandomCallerRandomPlayer(5), RandomCallerRandomPlayer(6), RandomCallerRandomPlayer(7), RandomCallerRandomPlayer(8)])
+    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
     game.deck.pop(0)
     game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
     game.round = 12
@@ -260,11 +254,6 @@ def test_game_reset():
     assert game.play == 1
     assert game.first_to_play >= 0 and game.first_to_play <= 3
     assert game.first_to_play == 0 or game.first_suit == game.in_play[0].suit
-
-    assert game.players[0].number == 5
-    assert game.players[1].number == 6
-    assert game.players[2].number == 7
-    assert game.players[3].number == 8
 
 def test_game_reset_vars():
     game = Game()

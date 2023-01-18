@@ -14,10 +14,11 @@ def get_complement(observation):
         return None
 
 def get_called(observation):
-    return sum([player['desired'] if player['desired'] != -1 else 0 for player in observation['players'].values()])
+    return sum([observation['player{num}desired'.format(player_num)] if observation['player{num}desired'.format(player_num)] != -1 else 0 for player_num in range(4)])
     
 def last_to_call(observation, player_num = 0):
-    for i, player in enumerate(observation['players'].values()):
-        if player['desired'] == -1 and player_num != i:
+    for i in range(4):
+        key = "player{num}desired".format(num=i)
+        if observation[key] == -1 and i != player_num:
             return False
     return True

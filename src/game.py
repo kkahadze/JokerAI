@@ -127,12 +127,18 @@ class Game:
                 self.wild_suit = 4
 
     def to_obs(self):
+        player_dict = {str(player.number) : player.to_obs() 
+                            for player in self.players
+                        }
+
         in_play_ints = []
         for card_num in range(3):
             if card_num < len(self.in_play):
                 in_play_ints.append(card_to_int(self.in_play[card_num]))
             else:
                 in_play_ints.append(44)
+
+        print(player_dict)
 
         return {
             "dealt": self.get_num_to_deal(),
@@ -142,9 +148,19 @@ class Game:
             "first_suit": self.first_suit,
             "jokers_remaining": self.jokers_remaining,
             "in_play": in_play_ints,
-            "players": {str(player.number) : player.to_obs() 
-                            for player in self.players
-                        }
+
+            "player0hand": player_dict['0']['hand'],
+            "player0taken": player_dict["0"]['taken'],
+            "player0desired": player_dict["0"]['desired'],
+
+            "player1taken": player_dict["1"]['taken'],
+            "player1desired": player_dict["1"]['desired'],
+
+            "player2taken": player_dict["2"]['taken'],
+            "player2desired": player_dict["2"]['desired'],
+
+            "player3taken": player_dict["3"]['taken'],
+            "player3desired": player_dict["3"]['desired'],
         }
 
     def update_play(self):
@@ -226,20 +242,19 @@ class Game:
         self.in_play.append(card)
 
     def print_game(self):
-        obs = self.to_obs()
         print("____________________________________________________________________________")
         print()
         print("Round: " + str(self.round))
         print("Play: " + str(self.play))
-        print("Dealt: " + str(obs["dealt"]))
-        print("Wildsuit: " + int_to_suit(obs['wild_suit']))
-        print("First to play: " + str(obs['first_to_play']))
+        print("Dealt: " + str(self.get_num_to_deal()))
+        print("Wildsuit: " + int_to_suit(self.wild_suit))
+        print("First to play: " + str(self.first_to_play))
 
-        for num, player in enumerate(obs["players"].values()):
+        for num in range(4):
             print("Player: " + str(num))
             print("Hand: " + str(self.players[num].hand))
-            print("Calls: " + str(player["desired"]))
-            print("Takes: " + str(player["taken"]))
+            print("Calls: " + str(self.players[num].desired))
+            print("Takes: " + str(self.players[num].taken))
             print("")
 
         print("In play: " + str(self.in_play))

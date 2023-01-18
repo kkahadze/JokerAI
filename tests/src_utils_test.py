@@ -91,54 +91,46 @@ def test_suit_count():
     assert suit_count(mapped_hand) == (2, 3, 0, 2)
 
 def test_least_common_suit_in_hand():
-    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
+    obs = {"player0hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}
     assert least_common_suit_in_hand(obs) == 2
 
 def test_most_common_suit_in_hand():
-    obs = {"players": {"0": {"hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}}}
+    obs = {"player0hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}
     assert most_common_suit_in_hand(obs) == 1
 def test_wilsuit_count():
-    obs = {"players": {"0": {"hand": map(
+    obs = {"player0hand": map(
         lambda x: card_to_int(x), 
-        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}},
+        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])),
         "wild_suit": 2
         }
     assert wildsuit_count(obs) == 0
 
-    obs = {"players": {"0": {"hand": map(
+    obs = {"player0hand": map(
         lambda x: card_to_int(x), 
-        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}},
+        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])),
         "wild_suit": 1
         }
     assert wildsuit_count(obs) == 3
 
 def test_want_to_win():
     obs = {
-        "players": {
-            "0": {
-                "hand": map(
+        "player0hand": map(
                     lambda x: card_to_int(x), 
                     list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
-                "desired": 4,
-                "taken": 0
-            }
-        },
+        "player0desired": 4,
+        "player0taken": 0,
         "wild_suit": 1
     }
     assert want_to_win(obs)
 
     obs = {
-        "players": {
-            "0": {
-                "hand": map(
+        "player0hand": map(
                     lambda x: card_to_int(x), 
                     list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
-                "desired": 2,
-                "taken": 2,
-            }
-        },
+        "player0desired": 2,
+        "player0taken": 2,
         "wild_suit": 1
     }
     assert not want_to_win(obs)
@@ -183,30 +175,23 @@ def test_obs_to_string():
     obs = {
         "in_play": [13, 3, 46],
         "jokers_remaining": 1,
-        "players": {
-            "0": {
-                "hand": map(
+        "player0hand": map(
                     lambda x: card_to_int(x),
                     list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
-                "desired": 4,
-                "taken": 0
-            },
-            "1": {
-                "desired": 4,
-                "taken": 0
-            },
-            "2": {
-                "desired": 4,
-                "taken": 0
-            },
-            "3": {
-                "desired": 4,
-                "taken": 0
-            }
-        },
+        "player0desired": 4,
+        "player0taken": 0,
+
+        "player1desired": 4,
+        "player1taken": 0,
+
+        "player2desired": 4,
+        "player2taken": 0,
+
+        "player3desired": 4,
+        "player3taken": 0,
+
         "wild_suit": 1
-        
     }
 
     assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Joker (Highs) of Clubs, Joker (Highs) of Diamonds, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
@@ -214,16 +199,12 @@ def test_obs_to_string():
 
 def test_cards_in_hand():
     obs = {
-        "players": {
-            "0": {
-                "hand": map(
+        "player0hand": map(
                     lambda x: card_to_int(x),
                     list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
-                "desired": 4,
-                "taken": 0
-            }
-        }
+        "desired": 4,
+        "taken": 0
     }
     assert cards_in_hand(obs) == 9
 
@@ -281,16 +262,12 @@ def test_playable():
     obs = {
         "in_play": [46, 46, 46],
         "jokers_remaining": 2,
-        "players": {
-            "0": {
-                "hand": map(
+        "player0hand": map(
                     lambda x: card_to_int(x),
                     list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
                 ),
-                "desired": 4,
-                "taken": 0
-            }
-        },
+        "player0desired": 4,
+        "player0taken": 0,
         "wild_suit": 1
     }
 
@@ -299,16 +276,12 @@ def test_playable():
     obs = {
         "in_play": [1, 46, 46],
         "jokers_remaining": 2,
-        "players": {
-            "0": {
-                "hand": list(map(
+        "player0hand": list(map(
                     lambda x: card_to_int(x),
                     list([Card(6, 0), Card(10, 2), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 2), Card(11, 0)])
                 )),
-                "desired": 4,
-                "taken": 0
-            }
-        },
+        "player0desired": 4,
+        "player0taken": 0,
         "wild_suit": 2
     }
 
