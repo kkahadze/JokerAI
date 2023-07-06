@@ -1,8 +1,6 @@
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 from src.game import Game
-from src.player import Player
-from agents.utils import random_call, get_complement
-import random
+from agents.utils import random_call, get_compliment
 from src.utils import card_to_int
 
 def test_random_call():

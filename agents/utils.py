@@ -4,7 +4,7 @@ def random_call(observation):
     dealt = observation["dealt"]
     return random.randint(0, dealt)
 
-def get_complement(observation):
+def get_compliment(observation):
     dealt = observation["dealt"]
     if last_to_call(observation):
         called = get_called(observation)

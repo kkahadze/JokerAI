@@ -1,5 +1,3 @@
-from src.utils import card_to_int
-
 class Player():
     def __init__(self, number_in):
         self.number = number_in

@@ -93,8 +93,6 @@ class Game:
         if self.round == 5 or self.round == 4 and self.play > 4:
             return None
         else:
-            # print(f"Round: {self.round}, Play: {self.play}")
-            # print(f"Deal amounts: {self.deal_amounts[self.round - 1]}")
             return self.deal_amounts[self.round - 1][self.play - 1]
 
     def new_hand(self):
@@ -137,8 +135,6 @@ class Game:
                 in_play_ints.append(card_to_int(self.in_play[card_num]))
             else:
                 in_play_ints.append(44)
-
-        print(player_dict)
 
         return {
             "dealt": self.get_num_to_deal(),

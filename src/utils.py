@@ -207,7 +207,6 @@ def obs_to_string(observation):
 
     return obs_string
 
-
 def print_obs(observation):
     print(obs_to_string(observation))
     
@@ -319,7 +318,6 @@ def have_wild_suit(observation, number = 0, cards = []):
     else:
         return contains_suit(wildsuit, cards)
     
-
 def highest_of_suit(cards, suit):
     highest = 0
     max = 0
@@ -364,3 +362,23 @@ def indexes_of_transformed_jokers(cards):
         if card.value == 6 and cards.count(card) > 1:
             indexes.append(i)
     return indexes
+
+def adjust_for_order(hand, first):
+    playable_hand = []
+    if first:
+        for card in hand:
+            if card.value == 16:
+                for i in range(4):
+                    playable_hand.append(15, i)
+                    playable_hand.append(5, i)
+            else:
+                playable_hand.append(card)
+    else:
+        for card in hand:
+            if card.value == 16:
+                playable_hand.append(5, 0)
+                playable_hand.append(16, 0)
+            else:
+                playable_hand.append(card)
+
+    return playable_hand

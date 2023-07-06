@@ -1,14 +1,14 @@
 from src.player import Player
 import random
-from agents.utils import get_complement
-from src.utils import playable, card_to_int, first_to_play, filter_by_suit_with_joks, wildsuit_exists, get_wildsuit, have_wild_suit
+from src.utils import playable, card_to_int, filter_by_suit_with_joks, wildsuit_exists, have_wild_suit, adjust_for_order
+from agents.utils import get_compliment
 
 class RandomCallerRandomPlayer(Player):
     def __init__(self, number):
         super().__init__(number)
         
     def call(self, observation = None):
-        complement = get_complement(observation)
+        complement = get_compliment(observation)
         call = random.randint(0, len(self.hand))
         while call == complement:
             call = random.randint(0, len(self.hand))
@@ -86,23 +86,3 @@ class RandomCallerRandomPlayer(Player):
             if card.suit == suit:
                 return True
         return False
-
-def adjust_for_order(hand, first):
-    playable_hand = []
-    if first:
-        for card in hand:
-            if card.value == 16:
-                for i in range(4):
-                    playable_hand.append(15, i)
-                    playable_hand.append(5, i)
-            else:
-                playable_hand.append(card)
-    else:
-        for card in hand:
-            if card.value == 16:
-                playable_hand.append(5, 0)
-                playable_hand.append(16, 0)
-            else:
-                playable_hand.append(card)
-
-    return playable_hand
