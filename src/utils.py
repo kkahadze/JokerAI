@@ -11,7 +11,7 @@ def card_to_int(card: Card, first=False) -> int:
     elif card.value == 16:
         return 34  # 34 if red, 35 if black
     elif card.value == 5:
-        if first:
+        if card.suit < 4:
             return 36 + card.suit
         else:
             return 35
@@ -30,7 +30,7 @@ def int_to_card(card_index: int, restricted_suits = None) -> Card:
             suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
         else:
             suit = random.choice(range(4))
-        return Card(16, suit)
+        return Card(16, 0)
     elif card_index == 35:
         if restricted_suits:
             suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
@@ -168,7 +168,7 @@ def beatable_obs(observation):
         
 def cards_in_hand(observation):
     hand = observation["player0hand"]
-    return 9 - [card == 44 for card in hand].count(True)
+    return len(hand)
 
 def obs_to_string(observation):
     obs_string = ""
@@ -296,7 +296,7 @@ def contains_suit(suit, hand):
     '''
     Returns True if the hand contains the given suit
     '''
-    return suit in list(map(lambda card: card.suit, hand))
+    return suit in list(map(lambda card: card.suit if card else -1, hand))
 
 def has_first_suit(observation):
     '''
@@ -335,7 +335,7 @@ def index_of_highest_of_suit(cards, suit):
     highest = 0
     max = 0
     for i, card in enumerate(cards):
-        if card.suit == suit and card.value >= max:
+        if card and card.suit == suit and card.value >= max:
             max = card.value
             highest = i
     
@@ -347,19 +347,19 @@ def index_of_highest_of_suit(cards, suit):
 def index_of_latest_base_joker(cards):
     index = -1
     for i, card in enumerate(cards):
-        if card.value == 16:
+        if card and card.value == 16:
             index = i
     return index
 
 def get_transformed_joker(cards):
     for card in cards:
-        if card.value == 6 and cards.count(card) > 1:
+        if card and card.value == 6 and cards.count(card) > 1:
             return card
 
 def indexes_of_transformed_jokers(cards):
     indexes = []
     for i, card in enumerate(cards):
-        if card.value == 6 and cards.count(card) > 1:
+        if card and card.value == 6 and cards.count(card) > 1:
             indexes.append(i)
     return indexes
 
@@ -369,16 +369,57 @@ def adjust_for_order(hand, first):
         for card in hand:
             if card.value == 16:
                 for i in range(4):
-                    playable_hand.append(15, i)
-                    playable_hand.append(5, i)
+                    playable_hand.append(Card(15, i))
+                    playable_hand.append(Card(5, i))
             else:
                 playable_hand.append(card)
     else:
         for card in hand:
             if card.value == 16:
-                playable_hand.append(5, 0)
-                playable_hand.append(16, 0)
+                playable_hand.append(Card(5, 4))
+                playable_hand.append(Card(15, 0))
             else:
                 playable_hand.append(card)
 
     return playable_hand
+
+def winner(observation):
+    wildsuit = observation["wild_suit"]
+    cards = [int_to_card(card_int) for card_int in observation["in_play"]]
+
+    if cards.count(None) == 2:
+        return 0
+    
+    if cards.count(None) == 3:
+        return None
+    
+    first_suit = observation["first_suit"] # something wrong here
+
+    if 16 in [card.value if card else -1 for card in cards]: # joker was played
+        print("joker")
+        return index_of_latest_base_joker(cards)
+    elif 15 in [card.value if card else -1 for card in cards]: # joker (vishi) was played
+         print("vishi")
+         return index_of_latest_base_joker(cards)
+    elif (5 in [card.value if card else -1 for card in cards]): # joker (waigos) was played
+        for card in cards:
+            if card and card.suit == cards[0].suit and card.value > 5:
+                return cards.index(card)
+        print("ZERO")
+        return 0
+    else:
+        transformed_joker = get_transformed_joker(cards)
+        if transformed_joker:
+            indexes_of_indenticals = indexes_of_transformed_jokers(cards)
+            is_transformed_suit = [True if card and card.suit == cards[indexes_of_indenticals[0]].suit else False for card in cards]
+            if is_transformed_suit.count(True) == len(indexes_of_indenticals):
+                return indexes_of_indenticals[0]
+        elif wildsuit == 4: # no wildsuit
+            return index_of_highest_of_suit(cards, first_suit)
+        else:
+            if first_suit == wildsuit:
+                return index_of_highest_of_suit(cards, first_suit)
+            elif contains_suit(wildsuit, cards): # a wildsuit was played
+                return index_of_highest_of_suit(cards, wildsuit)
+            else:
+                return index_of_highest_of_suit(cards, first_suit)

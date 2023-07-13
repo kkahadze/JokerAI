@@ -25,6 +25,7 @@ class Card(object):
             1: lambda : "Clubs",
             2: lambda : "Hearts",
             3: lambda : "Spades",
+            4: lambda : "Nizhe",
         }
         
         value_name = values[self.value]()

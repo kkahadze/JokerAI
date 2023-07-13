@@ -83,11 +83,13 @@ def test_get_calls():
     # the type of agent
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
     game.reset_vars()
-    game.get_calls()
-    for player_num in range(game.first_to_play, game.first_to_play + 4):
-        game.deck.deal(game.players[player_num % 4].hand, times = game.get_num_to_deal()) # player num needs to be modded to get the correct players
-    calls = game.get_calls()
+    for player_num in range(4):
+        game.deck.deal(game.players[player_num].hand, times = game.get_num_to_deal())
+    call_order = [(game.first_to_play + i) % 4 for i in range(4)]
+    game.get_calls(call_order)
 
+    calls = [game.players[i].desired for i in range(4)]
+    
     assert calls[0] >= 0 and calls[0] <=1
     assert calls[1] >= 0 and calls[1] <=1
     assert calls[2] >= 0 and calls[2] <=1
@@ -97,7 +99,8 @@ def test_deal():
     # This function tests the deal() function in game.py to assure that it deals the correct number of cards to each player
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
     game.reset_vars()
-    game.get_calls()
+    call_order = [(game.first_to_play + i) % 4 for i in range(4)]
+    game.get_calls(call_order)
     game.deal()
 
     assert len(game.players[0].hand) == 1
@@ -109,7 +112,8 @@ def test_deal():
 
     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
     game.reset_vars()
-    game.get_calls()
+    call_order = [(game.first_to_play + i) % 4 for i in range(4)]
+    game.get_calls(call_order)
     game.deal()
 
     assert len(game.players[0].hand) == 9
@@ -221,7 +225,8 @@ def test_get_calls():
         cards_per_player = game.get_num_to_deal()
         game.deck.deal(game.players[player_num % 4].hand, times = cards_per_player) # player num needs to be modded to get the correct players
         
-    game.get_calls()
+    call_order = [(game.first_to_play + i) % 4 for i in range(4)]
+    game.get_calls(call_order)
 
     assert game.players[0].taken >= 0 and game.players[0].taken <= 1
     assert game.players[1].taken >= 0 and game.players[1].taken <= 1

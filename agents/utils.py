@@ -14,7 +14,12 @@ def get_compliment(observation):
         return None
 
 def get_called(observation):
-    return sum([observation['player{num}desired'.format(player_num)] if observation['player{num}desired'.format(player_num)] != -1 else 0 for player_num in range(4)])
+    count = 0
+    for number in range(4):
+        tag = 'player{num}desired'.format(num=number)
+        if observation[tag] != -1:
+            count += observation[tag]
+    return count
     
 def last_to_call(observation, player_num = 0):
     for i in range(4):

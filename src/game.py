@@ -3,7 +3,7 @@ from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
 
-from src.utils import card_to_int, int_to_card, contains_suit, highest_of_suit, index_of_highest_of_suit, int_to_suit, index_of_latest_base_joker, indexes_of_transformed_jokers, get_transformed_joker
+from src.utils import card_to_int, int_to_card, int_to_suit, winner
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
@@ -41,7 +41,8 @@ class Game:
     def reset(self):
         self.reset_vars()
         self.deal()
-        self.get_calls()
+        call_order = [(self.first_to_play + i) % 4 for i in range(4)]
+        self.get_calls(call_order)
 
         player_num = self.first_to_play
         if player_num != 0: 
@@ -67,7 +68,7 @@ class Game:
         # self.gone = [0 for i in range(36)]
 
     def step(self, action):
-        self.player_0_play(action, first=self.first_to_play == 0)
+        self.player_0_play(action)
         self.pre_plays()
         self.process_hand_results()
         
@@ -100,7 +101,8 @@ class Game:
         self.update_play()
         if not self.done:
             self.deal()
-            self.get_calls()
+            call_order = [(self.first_to_play + i) % 4 for i in range(4)]
+            self.get_calls(call_order)
         else:
             self.done = True
 
@@ -108,8 +110,8 @@ class Game:
         for player in self.players:
             player.update_score(self.get_num_to_deal())
 
-    def get_calls(self):
-        for player_num in range(4):
+    def get_calls(self, players):
+        for player_num in players:
             self.players[player_num].call(self.to_obs())
 
     def deal(self):
@@ -182,12 +184,13 @@ class Game:
     def get_plays(self, players):
         for player_num in players:
             choice = self.ask_to_play(player_num)
-            if player_num == self.first_to_play:
+            if self.in_play == []:
                 self.first_suit = choice.suit
             self.in_play.append(choice)
 
     def ask_to_play(self, player_num):
-        return self.players[player_num].play(self.to_obs())
+        card_played = self.players[player_num].play(self.to_obs())
+        return card_played
 
     def process_hand_results(self):
         winner = self.update_take()
@@ -195,34 +198,9 @@ class Game:
         self.reset_play()
 
     def update_take(self):
-        play_winner = (self.first_to_play + self.winner(self.in_play)) % 4
+        play_winner = (self.first_to_play + winner(self.to_obs())) % 4
         self.players[play_winner].add_take()
         return play_winner
-
-    def winner(self, cards):
-        wildsuit = self.wild_suit
-        first_suit = cards[0].suit
-
-        if 16 in [card.value for card in cards]: # joker was played
-            return index_of_latest_base_joker(cards)
-        elif 15 in [card.value for card in cards]: # joker (vishi) was played
-            return 0
-        else:
-            transformed_joker = get_transformed_joker(cards)
-            if transformed_joker:
-                indexes_of_indenticals = indexes_of_transformed_jokers(cards)
-                is_transformed_suit = [True if card.suit == cards[indexes_of_indenticals[0]].suit else False for card in cards]
-                if is_transformed_suit.count(True) == len(indexes_of_indenticals):
-                    return indexes_of_indenticals[0]
-            elif wildsuit == 4: # no wildsuit
-                return index_of_highest_of_suit(cards, first_suit)
-            else:
-                if first_suit == wildsuit:
-                    return index_of_highest_of_suit(cards, first_suit)
-                elif contains_suit(wildsuit, cards): # a wildsuit was played
-                    return index_of_highest_of_suit(cards, wildsuit)
-                else:
-                    return index_of_highest_of_suit(cards, first_suit)
 
     def reset_play(self):
         self.in_play = []
@@ -231,9 +209,9 @@ class Game:
     def is_done(self):
         return self.done
 
-    def player_0_play(self, play, first):
+    def player_0_play(self, play):
         card = int_to_card(play)
-        if first:
+        if self.in_play == []:
             self.first_suit = card.suit
         self.in_play.append(card)
 

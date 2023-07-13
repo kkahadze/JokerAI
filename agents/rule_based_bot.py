@@ -9,40 +9,65 @@
     # QUEEN:    24        25      26        27
     # KING:     28        29      30        31
     # ACE:      32        33      34        35
-from src.utils import filter_by_suit_with_joks, have_wild_suit, playable, card_to_int, wildsuit_exists, adjust_for_order, get_compliment
+
+from src.utils import filter_by_suit_with_joks, have_wild_suit, playable, card_to_int, wildsuit_exists, adjust_for_order
 from src.player import Player
+from agents.utils import get_compliment
 import random
+from src.card import Card
 
-class RuleBasedAgent(Player):
-    def __init__(self, env):
+class RuleBasedBot(Player):
+    def __init__(self, number, env = None):
+        super().__init__(number)
         self.env = env
-
-
-    def choose_card(self, observation):
-        options = playable(observation)
-
-        if len(options) == 1:
-            return options[0]
     
     def call(self, observation = None):
-        complement = get_compliment(observation)
-        call = random.randint(0, len(self.hand))
-        while call == complement:
-            call = random.randint(0, len(self.hand))
+        compliment = get_compliment(observation)
+        wild_suit = observation["wild_suit"]
+        call = 0
+
+        for card in self.hand:
+            if (card.value > 10 and card.suit == wild_suit) or card.value == 16:
+                call += 1 
+
+        if compliment and compliment == call:
+            if call == 0:
+                call = 1
+            else:
+                call = call - 1
+        
+        if call == 1:
+            call = 0
+
         self.desired = call
         return call
 
     def play(self, observation):
         if self.number == 0:
             choices = playable(observation)
-            if not choices:
-                print("Player 0: No playable cards")
-                print("Player {}: Hand: {}".format(self.number, self.hand))
         else:
             choices = self.opp_playable(observation)
-            if not choices:
-                print("Player {}: No playable cards".format(self.number))
-                print("Player {}: Hand: {}".format(self.number, self.hand))
+
+        dont_want_more = (self.desired - self.taken) <= 0
+        want_more = not dont_want_more
+
+        if dont_want_more:
+            if self.have_jokers():
+                choice = self.get_joker()
+                self.hand.remove(choice)
+                return Card(5, 4)
+            elif (self.losable(observation)):
+                choice = self.losable_card(observation)
+                # print("hand: ", self.hand, "wild_suit", observation["wild_suit"], "first_suit", observation["first_suit"])
+                # print("choice: ", choice)
+                self.hand.remove(choice)
+                return choice
+        
+        if want_more and self.winnable(observation):
+            choice = self.winnable_card(observation)
+            self.hand.remove(choice)
+            return choice
+            
         choice = random.choice(choices)
         self.hand.remove(choice)
         return choice
