@@ -86,3 +86,9 @@ class Card(object):
 
     def is_joker(self):
         return self.value == 15
+    
+    def base(self):
+        if self.value != 15 and self.value != 5:
+            return self
+        else:
+            return Card(16, 0)

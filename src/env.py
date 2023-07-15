@@ -2,6 +2,8 @@ import gym
 from gym import spaces
 from src.game import Game
 import numpy as np
+from src.utils import card_to_int, int_to_card, int_to_suit, winner
+from agents.rule_based_bot import RuleBasedBot
 
 class JokerEnv(gym.Env):
     metadata = {}
@@ -61,14 +63,17 @@ class JokerEnv(gym.Env):
 
     def step(self, action):
         # Execute one time step within the environment
-        self.game.step(action)
+        if action in [card_to_int(card) for card in self.game.players[0].hand]:
+            self.game.step(action)
+        else:
+            self.game.step(card_to_int(self.game.players[0].hand[0]))
         obs = self.game.to_obs()
-        reward = 1 if self.game.highest_score_player() == 0 else 0
-        done = self.game.round == 5
-        return obs, reward, self.game.done, {}
+        reward = self.game.players[0].score
+        done = self.game.done
+        return obs, reward, done, {}
 
     def reset(self):
         # Reset the state of the environment to an initial state
-        self.game = Game()
+        self.game = Game([RuleBasedBot(0), RuleBasedBot(1), RuleBasedBot(2), RuleBasedBot(3)])
         self.game.reset()
         return self.game.to_obs()

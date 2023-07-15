@@ -2,13 +2,13 @@ import random
 from src.deck import Deck
 from src.player import Player
 from agents.random_caller_random_player import RandomCallerRandomPlayer
+from src.utils import playable, adjust_for_order
 
 from src.utils import card_to_int, int_to_card, int_to_suit, winner
 
 class Game:
     def __init__(self, players_in: list = [RandomCallerRandomPlayer(i) for i in range(4)], only_nines=False):
         self.player_types = [type(player) for player in players_in]
-
         if only_nines:
             self.only_nines = True
             self.deal_amounts = [
@@ -82,7 +82,7 @@ class Game:
 
     def pre_plays(self):
         if self.first_to_play != 1:
-            rest_of_players = range(1, (self.first_to_play + 3) % 4)
+            rest_of_players = range(1, (self.first_to_play + 3) % 4 + 1)
             self.get_plays(rest_of_players)
 
     def post_plays(self):
@@ -183,7 +183,7 @@ class Game:
 
     def get_plays(self, players):
         for player_num in players:
-            choice = self.ask_to_play(player_num)
+            choice = self.ask_to_play(player_num % 4)
             if self.in_play == []:
                 self.first_suit = choice.suit
             self.in_play.append(choice)
@@ -209,11 +209,26 @@ class Game:
     def is_done(self):
         return self.done
 
-    def player_0_play(self, play):
-        card = int_to_card(play)
+    def player_0_play(self, play): # may just need to be combined with other plays
+        card_chosen = int_to_card(play)
+
+        if card_chosen in self.players[0].hand:
+            self.players[0].hand.remove(card_chosen)
+        elif self.first_to_play == 0 and card_chosen.base() in self.players[0].hand:
+            self.players[0].hand.remove(card_chosen.base())
+        else:
+            playab = playable(self.to_obs())
+            first_to_play = self.first_to_play == 0
+            adjusted = adjust_for_order(playab, first_to_play)
+            card_chosen = random.choice(adjusted)
+            base_card = card_chosen.base()
+            self.players[0].hand.remove(base_card)
+        
         if self.in_play == []:
-            self.first_suit = card.suit
-        self.in_play.append(card)
+            self.first_suit = card_chosen.suit
+
+
+        self.in_play.append(card_chosen)
 
     def print_game(self):
         print("____________________________________________________________________________")
@@ -254,3 +269,14 @@ class Game:
             if self.players[i].score > self.players[max_player].score:
                 max_player = i
         return max_player
+    
+    def print_game_state(self):
+        # Print out the cards every player has
+        for player in self.players:
+            print("Player " + str(player.number) + " has: " + str(player.hand))
+        print("")
+
+        # Print out the cards that have been played
+        print("Cards in play: " + str(self.in_play))
+
+        #  

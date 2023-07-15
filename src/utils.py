@@ -26,17 +26,17 @@ def int_to_card(card_index: int, restricted_suits = None) -> Card:
     elif card_index < 2:
         return Card(6, card_index * 2)
     elif card_index == 34:
-        if restricted_suits:
-            suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
-        else:
-            suit = random.choice(range(4))
+        # if restricted_suits:
+        #     suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
+        # else:
+        #     suit = random.choice(range(4))
         return Card(16, 0)
     elif card_index == 35:
-        if restricted_suits:
-            suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
-        else:
-            suit = random.choice(range(4))
-        return Card(5, suit)
+        # if restricted_suits:
+        #     suit = random.choice(list(filter(lambda suit: suit not in restricted_suits, range(4))))
+        # else:
+        #     suit = random.choice(range(4))
+        return Card(5, 4)
     elif card_index >= 36 and card_index <= 39:
         return Card(5, (card_index - 36))
     elif card_index >= 40 and card_index <= 43:
@@ -156,7 +156,7 @@ def garunteed_win_with_jok(observation):
     '''
     Returns True if a player can garunteed by playing a joker
 `    '''
-    if observation["in_play"][-1] != 46:
+    if observation["in_play"][-1] != 44:
         return True
     elif observation["jokers_remaining"] == 1:
         return True
@@ -349,6 +349,10 @@ def index_of_latest_base_joker(cards):
     for i, card in enumerate(cards):
         if card and card.value == 16:
             index = i
+    if index == -1:
+        for i, card in enumerate(cards):
+            if card and card.value == 15:
+                index = i
     return index
 
 def get_transformed_joker(cards):
@@ -377,7 +381,7 @@ def adjust_for_order(hand, first):
         for card in hand:
             if card.value == 16:
                 playable_hand.append(Card(5, 4))
-                playable_hand.append(Card(15, 0))
+                playable_hand.append(Card(16, 0))
             else:
                 playable_hand.append(card)
 
@@ -395,17 +399,15 @@ def winner(observation):
     
     first_suit = observation["first_suit"] # something wrong here
 
+
     if 16 in [card.value if card else -1 for card in cards]: # joker was played
-        print("joker")
         return index_of_latest_base_joker(cards)
     elif 15 in [card.value if card else -1 for card in cards]: # joker (vishi) was played
-         print("vishi")
-         return index_of_latest_base_joker(cards)
+        return index_of_latest_base_joker(cards)
     elif (5 in [card.value if card else -1 for card in cards]): # joker (waigos) was played
         for card in cards:
             if card and card.suit == cards[0].suit and card.value > 5:
                 return cards.index(card)
-        print("ZERO")
         return 0
     else:
         transformed_joker = get_transformed_joker(cards)
@@ -422,4 +424,5 @@ def winner(observation):
             elif contains_suit(wildsuit, cards): # a wildsuit was played
                 return index_of_highest_of_suit(cards, wildsuit)
             else:
-                return index_of_highest_of_suit(cards, first_suit)
+                index_of_highest = index_of_highest_of_suit(cards, first_suit)
+                return index_of_highest

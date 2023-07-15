@@ -1,4 +1,4 @@
-from src.utils import int_to_card, card_to_int, playable, winner
+from src.utils import int_to_card, card_to_int, playable, winner, adjust_for_order
 from src.card import Card
 
 class Player():
@@ -58,6 +58,7 @@ class Player():
         first_suit = observation["first_suit"]
         wild_suit = observation["wild_suit"]
         played = [int_to_card(card_int) for card_int in observation["in_play"]]
+        observation["player0hand"] = [card_to_int(card) for card in self.hand]
         options = playable(observation)
 
         if first_to_play == self.number or self.have_jokers():
@@ -109,48 +110,31 @@ class Player():
         options = playable(observation)
         cur_winner = winner(observation)
 
-        print("Played", played)
-        print("Options", options)
-
-        # print(observation)
-
         if first_to_play == self.number or self.have_jokers():
-            print("option 1")
             return True
         elif (1 in [1 if card and (card.value == 15 or card.value == 16) else 0 for card in played]): # if there is a joker or 2 in play
-            print("option 2")
             return True
         elif True in [card.suit == played[cur_winner].suit and card.value < played[cur_winner].value for card in options]:
-            # print("option 3")
             return True
         elif True in [card.suit != wild_suit and card.suit != first_suit and (cur_winner and card.value < played[cur_winner].value) for card in options]:
             return True
         else:
             return False
 
-    def losable_card(self, observation):
+    def losable_card(self, observation): # needs testing
         first_to_play = observation["first_to_play"]
         first_suit = observation["first_suit"]
         wild_suit = observation["wild_suit"]
         played = [int_to_card(card_int) for card_int in observation["in_play"]]
         observation["player0hand"] = [card_to_int(card) for card in self.hand]
-        options = playable(observation)
+        options = adjust_for_order(playable(observation), first_to_play == self.number)
         cur_winner = winner(observation)
-
-        if cur_winner:
-            print("PLAYED", played)
-            print("CURRENT WINNER", played[cur_winner])
-        else:
-            print("CURRENT WINNER", None)
-
-        if len(options) == 1 or (Card(16, 0) in played and (not self.have_jokers())):
-            return options[0]
-
-        if first_to_play == self.number:
+        
+        if len(options) == 1 or (Card(16, 0) in played and (not self.have_jokers())) or first_to_play == self.number:
             return options[0]
         elif self.have_jokers():
-            return self.get_joker()
-        
+            return self.get_joker()        
+
         for card in options:
             if card and card.value == 16:
                 return card
@@ -160,6 +144,8 @@ class Player():
                 return card
             if card.suit != wild_suit and card.suit != first_suit:
                 return card
+        
+        return options[0]
         
     def lowest_valued_card():
         return 1

@@ -15,6 +15,7 @@ from src.player import Player
 from agents.utils import get_compliment
 import random
 from src.card import Card
+from src.utils import int_to_card, card_to_int, playable, winner
 
 class RuleBasedBot(Player):
     def __init__(self, number, env = None):
@@ -43,6 +44,7 @@ class RuleBasedBot(Player):
         return call
 
     def play(self, observation):
+        observation['player0hand'] = [card_to_int(card) for card in self.hand]
         if self.number == 0:
             choices = playable(observation)
         else:
@@ -58,8 +60,6 @@ class RuleBasedBot(Player):
                 return Card(5, 4)
             elif (self.losable(observation)):
                 choice = self.losable_card(observation)
-                # print("hand: ", self.hand, "wild_suit", observation["wild_suit"], "first_suit", observation["first_suit"])
-                # print("choice: ", choice)
                 self.hand.remove(choice)
                 return choice
         
@@ -92,6 +92,7 @@ class RuleBasedBot(Player):
             first_to_play = observation["first_to_play"]
             
             opp_playable = []
+
             adjusted_hand = adjust_for_order(self.hand, first_to_play == self.number)
 
             if self.number == first_to_play or len(self.hand) == 1:
