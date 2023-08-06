@@ -1,6 +1,7 @@
 from src.card import Card
 from collections import OrderedDict
 import random
+import pandas as pd
 
 def additional_hands_desired(observation):
     return observation['player0desired'] - observation['player0taken']
@@ -426,3 +427,71 @@ def winner(observation):
             else:
                 index_of_highest = index_of_highest_of_suit(cards, first_suit)
                 return index_of_highest
+            
+def flatten_obs(obs):
+    return {'dealt': obs['dealt'],
+            'wild_suit': obs['wild_suit'],
+            'player0hand_0': obs['player0hand'][0],
+            'player0hand_1': obs['player0hand'][1],
+            'player0hand_2': obs['player0hand'][2],
+            'player0hand_3': obs['player0hand'][3],
+            'player0hand_4': obs['player0hand'][4],
+            'player0hand_5': obs['player0hand'][5],
+            'player0hand_6': obs['player0hand'][6],
+            'player0hand_7': obs['player0hand'][7],
+            'player0hand_8': obs['player0hand'][8],
+            'player0desired': obs['player0desired'],
+            'player0taken': obs['player0taken'],
+            'player1taken': obs['player1taken'],
+            'player1desired': obs['player1desired'],
+            'player2taken': obs['player2taken'],
+            'player2desired': obs['player2desired'],
+            'player3taken': obs['player3taken'],
+            'player3desired': obs['player3desired'],
+            'jokers_remaining': obs['jokers_remaining'],
+            'first_to_play': obs['first_to_play'],
+            'first_suit': obs['first_suit'],
+            'in_play_0': obs['in_play'][0] if len(obs['in_play']) > 0 else 44,
+            'in_play_1': obs['in_play'][1] if len(obs['in_play']) > 1 else 44,
+            'in_play_2': obs['in_play'][2] if len(obs['in_play']) > 2 else 44,
+            'dealer': obs['dealer'],
+            }
+
+def clean_data_for_call_decision_training(call_data):
+
+    # Assuming your data is stored in a variable named data
+    data = call_data
+
+    # Create an empty list to store the transformed data
+    transformed_data = []
+
+    for item in data:
+        # Clone the dictionary to not modify the original data
+        clone = item[0].copy()
+        # Add the last number of each entry as a new key-value pair to the dictionary
+        clone['result'] = item[1]
+        # Append the transformed dictionary to the list
+        transformed_data.append(clone)
+
+    # Convert the list of dictionaries into a pandas DataFrame
+    df = pd.DataFrame(transformed_data)
+
+    # Handling 'in_play'
+    in_play_df = pd.DataFrame(df['in_play'].to_list(), 
+                            columns=['in_play' + str(i) for i in range(1, len(df['in_play'].iloc[0])+1)])
+    df = pd.concat([df.drop('in_play', axis=1), in_play_df], axis=1)
+
+    # Handling 'player0hand'
+    player0hand_df = pd.DataFrame(df['hand'].to_list(), 
+                                columns=['hand' + str(i) for i in range(1, len(df['hand'].iloc[0])+1)])
+    df = pd.concat([df.drop('hand', axis=1), player0hand_df], axis=1)
+
+    columns_to_keep = ['dealt', 'desired', 'first_to_play', 'dealer', 'wild_suit', 'player0desired',
+                    'player1desired', 'player2desired',
+                    'player3desired', 'result',  'hand1', 'hand2', 'hand3', 'hand4', 
+                    'hand5', 'hand6', 'hand7', 'hand8', 'hand9', 'deciding_player']
+
+    df = df.loc[:, columns_to_keep]
+    df = df[df['result'] != 0]
+
+    return df

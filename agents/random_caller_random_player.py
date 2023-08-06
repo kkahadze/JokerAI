@@ -9,11 +9,11 @@ class RandomCallerRandomPlayer(Player):
         
     def call(self, observation = None):
         complement = get_compliment(observation)
-        call = random.randint(0, len(self.hand))
-        while call == complement:
-            call = random.randint(0, len(self.hand))
-        self.desired = call
-        return call
+        call_amount = random.randint(0, len(self.hand))
+        while call_amount == complement:
+            call_amount = random.randint(0, len(self.hand))
+        super().call(call_amount)
+        return self.desired
 
     def play(self, observation):
         if self.number == 0:
@@ -27,7 +27,7 @@ class RandomCallerRandomPlayer(Player):
                 print("Player {}: No playable cards".format(self.number))
                 print("Player {}: Hand: {}".format(self.number, self.hand))
         choice = random.choice(choices)
-        self.hand.remove(choice)
+        self.hand.remove(choice.base())
         return choice
 
     def to_obs(self):
@@ -86,3 +86,5 @@ class RandomCallerRandomPlayer(Player):
             if card.suit == suit:
                 return True
         return False
+    
+

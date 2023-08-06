@@ -8,6 +8,12 @@ class Player():
         self.score = 0
         self.desired = -1
         self.taken = 0
+        self.decision_time_obs = None
+
+    def call(self, call):
+        self.desired = call
+        self.decision_time_obs["desired"] = call
+        self.decision_time_obs["deciding_player"] = self.number
 
     def set_taken(self, taken):
         self.taken = taken
@@ -30,15 +36,18 @@ class Player():
     def across(self) -> int:
         return (self.number + 2) % 4
     
-    def update_score(self, dealt: int):
+    def update_score(self, dealt: int, game):
         if self.desired == self.taken: 
+            game.info["success"] += 1
             if self.taken == dealt:
                 self.score += dealt * 100 # 1 -> 100, 2 -> 200, 3 -> 300, 4 -> 400 ... 
             else:
                 self.score += self.taken * 50 + 50 # 1 -> 100, 2 -> 150, 3 -> 200, 4 -> 250 ...
         elif self.taken == 0: # 0 -> -200, bust/ხვიშტი
+            game.info["xishti"] += 1
             self.score -= 200
         else: # 1 -> 10, 2 -> 20, 3 -> 30, 4 -> 40 ...
+            game.info["bust"] += 1
             self.score += self.taken * 10
 
     def have_jokers(self):
@@ -154,3 +163,17 @@ class Player():
         self.desired = -1
         self.taken = 0
         self.hand = []
+
+    def record_decision_time_obs(self, observation):
+        obs = observation.copy()
+        obs["hand"] = []
+        for i in range(9):
+            if i < len(self.hand):
+                obs["hand"].append(card_to_int(self.hand[i]))
+            else:
+                obs["hand"].append(44)
+
+        self.decision_time_obs = obs
+
+    def get_call_data(self):
+        return (self.decision_time_obs, int(self.desired == self.taken))

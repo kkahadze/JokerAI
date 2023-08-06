@@ -25,23 +25,27 @@ class RuleBasedBot(Player):
     def call(self, observation = None):
         compliment = get_compliment(observation)
         wild_suit = observation["wild_suit"]
-        call = 0
+        call_amount = 0
 
         for card in self.hand:
-            if (card.value > 10 and card.suit == wild_suit) or card.value == 16:
-                call += 1 
-
-        if compliment and compliment == call:
-            if call == 0:
-                call = 1
-            else:
-                call = call - 1
+            if card.value == 16:
+                call_amount += 1 
         
-        if call == 1:
-            call = 0
+        wilds = 0
+        for card in self.hand:
+            if card.suit == wild_suit and (card.value > 10 or observation["dealt"] <= 2):
+                wilds += 1
+        
+        call_amount += (wilds)
 
-        self.desired = call
-        return call
+        if compliment and compliment == call_amount:
+            if call_amount == 0:
+                call_amount = 1
+            else:
+                call_amount = call_amount - 1
+        
+        super().call(call_amount)
+        return self.desired
 
     def play(self, observation):
         observation['player0hand'] = [card_to_int(card) for card in self.hand]
@@ -63,20 +67,20 @@ class RuleBasedBot(Player):
                 self.hand.remove(choice)
                 return choice
         
-        if want_more and self.winnable(observation):
+        if want_more and self.winnable(observation) and self.number != observation["first_to_play"]:
             choice = self.winnable_card(observation)
             self.hand.remove(choice)
             return choice
             
         choice = random.choice(choices)
-        self.hand.remove(choice)
+        self.hand.remove(choice.base())
         return choice
 
 
     def to_obs(self):
         if self.number == 0:
             return {
-                "hand": [card_to_int(card) for card in self.hand],
+                "hand": [card_to_int(self.hand[i]) if i < len(self.hand) else 44 for i in range(9)],
                 "desired": self.desired,
                 "taken": self.taken,
             }

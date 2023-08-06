@@ -2,7 +2,7 @@ import gym
 from gym import spaces
 from src.game import Game
 import numpy as np
-from src.utils import card_to_int, int_to_card, int_to_suit, winner
+from src.utils import card_to_int, int_to_card, int_to_suit, winner, flatten_obs
 from agents.rule_based_bot import RuleBasedBot
 
 class JokerEnv(gym.Env):
@@ -10,13 +10,26 @@ class JokerEnv(gym.Env):
 
     def __init__(self):
         # Observations are dictionaries containing the player's hand
-        self.observation_space = spaces.Dict(
+        self.observation_space = (spaces.Dict(
             {
                 # all can be any card or no card (meaning that the current player is the first to play)
-                "in_play": spaces.MultiDiscrete([47, 47, 47]), # 0-43, 44 = no card
+                "in_play_0": spaces.Discrete(45), # 0-43, 44 = no card
+                "in_play_1": spaces.Discrete(45), # 0-43, 44 = no card
+                "in_play_2": spaces.Discrete(45), # 0-43, 44 = no card
+
                 "wild_suit": spaces.Discrete(5), # 0-4, 4 = no wild suit
                 # "wild_value": spaces.Discrete(10), # 0-9
-                "player0hand": spaces.MultiDiscrete([35, 36, 36, 36, 36, 36, 36, 36, 36]), # 0-35, 36 = no card
+                
+                "player0hand_0": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_1": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_2": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_3": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_4": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_5": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_6": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_7": spaces.Discrete(44), # 0-43, 44 = no card
+                "player0hand_8": spaces.Discrete(44), # 0-43, 44 = no card
+
                 "player0desired": spaces.Discrete(11), # 0 - 9
                 "player0taken": spaces.Discrete(10), # 0-9
 
@@ -33,8 +46,8 @@ class JokerEnv(gym.Env):
                 "dealt": spaces.Discrete(10), # 0-9
                 # "gone": spaces.MultiBinary(36)
                 # "scores": spaces.MultiDiscrete([10, 10, 10, 10]), # others scores (who does it benefit to hurt)
-                # "streak": spaces.MultiBinary(4) # premia 
-            }
+                # "streak": spaces.MultiBinary(4) # 1emia 
+            })
         )
         
         # WRONG
@@ -67,7 +80,7 @@ class JokerEnv(gym.Env):
             self.game.step(action)
         else:
             self.game.step(card_to_int(self.game.players[0].hand[0]))
-        obs = self.game.to_obs()
+        obs = flatten_obs(self.game.to_obs())
         reward = self.game.players[0].score
         done = self.game.done
         return obs, reward, done, {}

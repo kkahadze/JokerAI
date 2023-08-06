@@ -37,6 +37,9 @@ class Game:
         self.in_play = []
 
         # self.gone = [0 for i in range(36)]
+        self.info = {}
+        self.call_data = []
+        self.wanted_and_tooks = []
 
     def reset(self):
         self.reset_vars()
@@ -48,6 +51,15 @@ class Game:
         if player_num != 0: 
             players_before = range(self.first_to_play, 4)
             self.get_plays(players_before)
+        self.info = {"rands": 0, 
+                     "choice": 0,
+                     "xishti": 0,
+                        "bust": 0,
+                        "success": 0,
+                     }
+        self.call_data = []
+        self.wanted_and_tooks = []
+        
 
     def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play and done
         self.deck = Deck()
@@ -108,10 +120,15 @@ class Game:
 
     def update_score(self):
         for player in self.players:
-            player.update_score(self.get_num_to_deal())
+            player.update_score(self.get_num_to_deal(), self)
+            if player.desired != player.taken:
+                self.wanted_and_tooks.append((player.desired, player.taken))
+                # print("Player wanted " + str(player.desired) + " but took " + str(player.taken))
+            self.call_data.append(player.get_call_data())
 
     def get_calls(self, players):
         for player_num in players:
+            self.players[player_num].record_decision_time_obs(self.to_obs())
             self.players[player_num].call(self.to_obs())
 
     def deal(self):
@@ -137,8 +154,7 @@ class Game:
                 in_play_ints.append(card_to_int(self.in_play[card_num]))
             else:
                 in_play_ints.append(44)
-
-        return {
+        out = {
             "dealt": self.get_num_to_deal(),
             "first_to_play": self.first_to_play,
             "dealer": self.dealer,
@@ -147,7 +163,8 @@ class Game:
             "jokers_remaining": self.jokers_remaining,
             "in_play": in_play_ints,
 
-            "player0hand": player_dict['0']['hand'],
+            "hand": [],
+
             "player0taken": player_dict["0"]['taken'],
             "player0desired": player_dict["0"]['desired'],
 
@@ -160,6 +177,11 @@ class Game:
             "player3taken": player_dict["3"]['taken'],
             "player3desired": player_dict["3"]['desired'],
         }
+
+        for i in range(9):
+            out['hand'].append(card_to_int(self.players[0].hand[i]) if i < len(self.players[0].hand) else 44)
+
+        return out
 
     def update_play(self):
         if self.play == len(self.deal_amounts[self.round - 1]): # if it is time to go to the next round
@@ -212,17 +234,17 @@ class Game:
     def player_0_play(self, play): # may just need to be combined with other plays
         card_chosen = int_to_card(play)
 
-        if card_chosen in self.players[0].hand:
-            self.players[0].hand.remove(card_chosen)
-        elif self.first_to_play == 0 and card_chosen.base() in self.players[0].hand:
-            self.players[0].hand.remove(card_chosen.base())
-        else:
-            playab = playable(self.to_obs())
-            first_to_play = self.first_to_play == 0
-            adjusted = adjust_for_order(playab, first_to_play)
-            card_chosen = random.choice(adjusted)
-            base_card = card_chosen.base()
-            self.players[0].hand.remove(base_card)
+        # if card_chosen in self.players[0].hand:
+        #     self.players[0].hand.remove(card_chosen)
+        # elif self.first_to_play == 0 and card_chosen.base() in self.players[0].hand:
+        #     self.players[0].hand.remove(card_chosen.base())
+        # else:
+        #     playab = playable(self.to_obs())
+        #     first_to_play = self.first_to_play == 0
+        #     adjusted = adjust_for_order(playab, first_to_play)
+        #     card_chosen = random.choice(adjusted)
+        #     base_card = card_chosen.base()
+        #     self.players[0].hand.remove(base_card)
         
         if self.in_play == []:
             self.first_suit = card_chosen.suit
@@ -280,3 +302,11 @@ class Game:
         print("Cards in play: " + str(self.in_play))
 
         #  
+
+    # def record_call_decision_time_obs(self, player):
+    #     obs = self.to_obs()
+    #     obs["player0hand"] = [card_to_int(card) for card in self.players[player].hand]
+    #     self.decision_time_obs.append(obs)
+
+    # def record_result_of_decision(self, player):
+    #     self.success.append(self.players[player].desired == len(self.players[player].hand))
