@@ -491,7 +491,7 @@ def clean_data_for_call_decision_training(call_data):
                     'player3desired', 'result',  'hand1', 'hand2', 'hand3', 'hand4', 
                     'hand5', 'hand6', 'hand7', 'hand8', 'hand9', 'deciding_player']
 
-    df = df.loc[:, columns_to_keep]
     df = df[df['result'] != 0]
+    df = df.loc[:, columns_to_keep]
 
     return df

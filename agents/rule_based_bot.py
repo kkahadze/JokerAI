@@ -21,6 +21,10 @@ class RuleBasedBot(Player):
     def __init__(self, number, env = None):
         super().__init__(number)
         self.env = env
+
+    def reset(self):
+        super().reset()
+        self.env = None
     
     def call(self, observation = None):
         compliment = get_compliment(observation)

@@ -63,10 +63,8 @@ class Game:
 
     def reset_vars(self): # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play and done
         self.deck = Deck()
-        self.players = [self.player_types[0](self.players[0].number),
-                        self.player_types[1](self.players[1].number),
-                        self.player_types[2](self.players[2].number),
-                        self.player_types[3](self.players[3].number)]
+        for player in self.players:
+            player.reset()
         self.round = 1
         self.play = 1
         self.first_to_play = random.randint(0, 3)
@@ -123,7 +121,6 @@ class Game:
             player.update_score(self.get_num_to_deal(), self)
             if player.desired != player.taken:
                 self.wanted_and_tooks.append((player.desired, player.taken))
-                # print("Player wanted " + str(player.desired) + " but took " + str(player.taken))
             self.call_data.append(player.get_call_data())
 
     def get_calls(self, players):

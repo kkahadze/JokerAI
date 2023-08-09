@@ -10,6 +10,13 @@ class Player():
         self.taken = 0
         self.decision_time_obs = None
 
+    def reset(self):
+        self.desired = -1
+        self.taken = 0
+        self.hand = []
+        self.score = 0
+        self.decision_time_obs = None
+
     def call(self, call):
         self.desired = call
         self.decision_time_obs["desired"] = call
