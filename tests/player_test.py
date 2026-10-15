@@ -1,4 +1,5 @@
-from src.player import Player
+from jokerai.player import Player
+
 
 def test_player_init():
     player1 = Player(0)
@@ -7,12 +8,14 @@ def test_player_init():
     assert player1.score == 0
     assert player1.desired == -1
 
+
 def test_player_repr():
     player1 = Player(0)
     assert repr(player1) == "Player 0"
 
     player2 = Player(1)
     assert repr(player2) == "Player 1"
+
 
 def test_player_get_right():
     player1 = Player(0)
@@ -21,6 +24,7 @@ def test_player_get_right():
     player2 = Player(1)
     assert player2.right() == 2
 
+
 def test_player_get_left():
     player1 = Player(0)
     assert player1.left() == 3
@@ -28,12 +32,14 @@ def test_player_get_left():
     player2 = Player(1)
     assert player2.left() == 0
 
+
 def test_player_get_across():
     player1 = Player(0)
     assert player1.across() == 2
 
     player2 = Player(1)
     assert player2.across() == 3
+
 
 def test_update_score():
     player = Player(0)
