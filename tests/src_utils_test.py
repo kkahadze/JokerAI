@@ -1,316 +1,112 @@
-from src.utils import least_common_suit_in_hand, wildsuit_count, suit_count, card_to_int, int_to_card, want_to_win, first_to_play, garunteed_win_with_jok, most_common_suit_in_hand, choose_suit_for_take, choose_suit_for_highest, playable, truncate_at_first_none, obs_to_string, cards_in_hand, int_to_suit, filter_by_suit_with_joks, first_suit_exists, first_suit_index, playable, contains_suit, highest_of_suit, get_transformed_joker, indexes_of_transformed_jokers
-from src.card import Card
-from src.env import JokerEnv
+import pytest
 
-# def test_card_to_int():
-#     card = Card(6, 0)
-#     assert card_to_int(card) == 0
+from jokerai.card import Card
+from jokerai.rules import card_to_int, consume_card, int_to_card, legal_actions, winner_index
+from jokerai.utils import (
+    cards_in_hand,
+    first_suit_exists,
+    first_suit_index,
+    first_to_play,
+    have_wild_suit,
+    least_common_suit_in_hand,
+    most_common_suit_in_hand,
+    obs_to_string,
+    playable,
+    suit_count,
+    truncate_at_first_none,
+    want_to_win,
+    wildsuit_count,
+)
 
-#     card = Card(6, 2)
-#     assert card_to_int(card) == 1
 
-#     card = Card(7, 0)
-#     assert card_to_int(card) == 2
+@pytest.mark.parametrize("index", range(44))
+def test_action_encoding_round_trip_is_deterministic(index):
+    card = int_to_card(index)
+    assert card == int_to_card(index)
+    assert card_to_int(card, first=36 <= index <= 43) == index
 
-#     card = Card(15, 0)
-#     assert card_to_int(card) == 34
 
-#     card = Card(15, 1)
-#     assert card_to_int(card) == 35
+@pytest.mark.parametrize("index", [-1, 45, 46, True, 1.5, "2"])
+def test_invalid_card_indices(index):
+    with pytest.raises(ValueError):
+        int_to_card(index)
 
-#     card = Card(11, 1)
-#     assert card_to_int(card) == 19
 
-#     for suit in range(0, 4):
-#         for value in range(6, 15):
-#             if value == 6 or value == 15:
-#                 continue
-#             assert card_to_int(Card(value, suit)) == (value - 7) * 4 + (suit) + 2
+def test_empty_padding_and_real_hand_size():
+    assert int_to_card(44) is None
+    assert cards_in_hand({"player0hand": [0, 34] + [44] * 7}) == 2
+    assert truncate_at_first_none([1, None, 2]) == [1]
+    assert truncate_at_first_none([1, 2]) == [1, 2]
 
-def test_int_to_card():
-    card = int_to_card(0)
-    assert card.value == 6 and card.suit == 0
 
-    card = int_to_card(1)
-    assert card.value == 6 and card.suit == 2
-
-    card = int_to_card(2)
-    assert card.value == 7 and card.suit == 0
-
-    card = int_to_card(34)
-    assert card.value == 16 
-
-    card = int_to_card(35)
-    assert card.value == 5 
-
-    card = int_to_card(19)
-    assert card.value == 11 and card.suit == 1
-
-    # for i in range(36):
-    #     card = int_to_card(i)
-    #     assert card_to_int(card) == i
-
-    card = int_to_card(36)
-    assert card.value == 5 and card.suit == 0
-
-    card = int_to_card(37)
-    assert card.value == 5 and card.suit == 1
-
-    card = int_to_card(38)
-    assert card.value == 5 and card.suit == 2
-
-    card = int_to_card(39)
-    assert card.value == 5 and card.suit == 3
-
-    card = int_to_card(40)
-    assert card.value == 15 and card.suit == 0
-
-    card = int_to_card(41)
-    assert card.value == 15 and card.suit == 1
-
-    card = int_to_card(42)
-    assert card.value == 15 and card.suit == 2
-
-    card = int_to_card(43)
-    assert card.value == 15 and card.suit == 3
-
-    # Restricted suits for Take/წაიღოს
-    card = int_to_card(35, restricted_suits=[0, 1])
-    assert card.value == 5 and (card.suit == 2 or card.suit == 3)
-
-    card = int_to_card(35, restricted_suits=[0, 2, 3])
-    assert card.value == 5 and card.suit == 1    
-
-def test_suit_count():
-    hand = [Card(6, 0), Card(10, 3), Card(11, 1)]
-    mapped_hand = map(lambda x : card_to_int(x), hand)
-    assert suit_count(mapped_hand) == (1, 1, 0, 1)
-
-    hand = [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
-    mapped_hand = map(lambda x : card_to_int(x), hand)
-    assert suit_count(mapped_hand) == (2, 3, 0, 2)
-
-def test_least_common_suit_in_hand():
-    obs = {"player0hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}
-    assert least_common_suit_in_hand(obs) == 2
-
-def test_most_common_suit_in_hand():
-    obs = {"player0hand": map(lambda x: card_to_int(x), list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]))}
-    assert most_common_suit_in_hand(obs) == 1
-def test_wilsuit_count():
-    obs = {"player0hand": map(
-        lambda x: card_to_int(x), 
-        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])),
-        "wild_suit": 2
-        }
+def test_suit_count_ignores_jokers_and_padding():
+    assert suit_count([0, 1, 2, 3, 4, 5, 34, 34, 44]) == (2, 1, 2, 1)
+    obs = {"player0hand": [0, 2, 34, 44], "wild_suit": 0}
+    assert have_wild_suit(obs)
+    assert wildsuit_count(obs) == 2
+    assert most_common_suit_in_hand(obs) == 0
+    assert least_common_suit_in_hand(obs) == 1
+    obs["wild_suit"] = 4
     assert wildsuit_count(obs) == 0
 
-    obs = {"player0hand": map(
-        lambda x: card_to_int(x), 
-        list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])),
-        "wild_suit": 1
-        }
-    assert wildsuit_count(obs) == 3
 
-def test_want_to_win():
+def test_diamonds_are_a_real_leading_suit():
+    assert first_to_play({"in_play": [44, 44, 44]})
+    obs = {"in_play": [0, 44, 44]}
+    assert first_suit_exists(obs)
+    assert first_suit_index(obs) == 0
+    assert not first_suit_exists({"in_play": [44, 44, 44]})
+
+
+def test_follow_suit_before_trump_and_allow_jokers():
+    hand = [Card(7, 0), Card(14, 1), Card(10, 2), Card(16, 0)]
+    assert legal_actions(hand, [Card(8, 0)], 1) == [2, 34, 35]
+    assert legal_actions(hand[1:], [Card(8, 0)], 1) == [31, 34, 35]
+    assert legal_actions(hand[2:], [Card(8, 0)], 1) == [16, 34, 35]
+    assert legal_actions(hand, [], 1) == [2, 16, 31] + list(range(36, 44))
+
+
+def test_high_declaration_requires_highest_of_requested_suit():
+    hand = [Card(7, 0), Card(14, 0), Card(14, 1), Card(16, 0)]
+    assert legal_actions(hand, [Card(15, 0)], 1) == [30, 34, 35]
+    assert legal_actions(hand, [Card(5, 0)], 1) == [2, 30, 34, 35]
+    assert winner_index([Card(15, 0), Card(14, 1), Card(14, 0)], 1) == 0
+    assert winner_index([Card(15, 0), Card(16, 4), Card(16, 4)], 1) == 2
+
+
+def test_low_joker_cannot_steal_trick_or_count_as_owned_suit():
+    assert winner_index([Card(7, 0), Card(5, 4), Card(14, 1)], 4) == 0
+    assert legal_actions([Card(16, 0), Card(14, 1)], [Card(8, 0)], 4) == [31, 34, 35]
+    assert winner_index([Card(5, 0), Card(14, 0), Card(7, 1)], 1) == 2
+
+
+def test_ordinary_card_consumption_and_missing_card():
+    hand = [Card(7, 0)]
+    assert consume_card(hand, 2) == Card(7, 0)
+    assert not hand
+    with pytest.raises(ValueError):
+        consume_card(hand, 2)
+
+
+def test_observation_helpers_use_new_contract():
     obs = {
-        "player0hand": map(
-                    lambda x: card_to_int(x), 
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-        "player0desired": 4,
+        "in_play": [0, 44, 44],
+        "player0hand": [2, 31, 34] + [44] * 6,
+        "wild_suit": 1,
+        "player0desired": 1,
         "player0taken": 0,
-        "wild_suit": 1
     }
+    assert playable(obs) == [Card(7, 0), Card(16, 4), Card(5, 4)]
     assert want_to_win(obs)
-
-    obs = {
-        "player0hand": map(
-                    lambda x: card_to_int(x), 
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-        "player0desired": 2,
-        "player0taken": 2,
-        "wild_suit": 1
-    }
+    obs["player0taken"] = 2
     assert not want_to_win(obs)
-    
-def test_first_to_play():
-    obs = {"in_play": [46, 46, 46]}
-    assert first_to_play(obs)
+    assert "Seven of Diamonds" in obs_to_string(obs)
 
-def test_garunteed_win_with_jok():
-    obs = {
-        "in_play": [13, 3, 46],
-        "jokers_remaining": 1
-        }
-    assert garunteed_win_with_jok(obs)
 
-    obs = {
-        "in_play": [13, 3, 46],
-        "jokers_remaining": 0
-    }
-    assert not garunteed_win_with_jok(obs)
-
-    obs = {
-        "in_play": [13, 3, 1],
-        "jokers_remaining": 1,
-    }
-    assert garunteed_win_with_jok(obs)
-    
-    obs = {
-        "in_play": [13, 3, 46],
-        "jokers_remaining": 2,
-    }
-    assert not garunteed_win_with_jok(obs)
-
-def test_truncate_at_first_none():
-    assert truncate_at_first_none([1, 2, 3, None, 4, 5]) == [1, 2, 3]
-    assert truncate_at_first_none([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]
-    assert truncate_at_first_none([1, 2, 3, None, None, 4, 5]) == [1, 2, 3]
-    assert truncate_at_first_none([1, 2, 3, None, None, None, 4, 5]) == [1, 2, 3]
-    assert truncate_at_first_none([None]) == []
-
-def test_obs_to_string():
-    obs = {
-        "in_play": [13, 3, 46],
-        "jokers_remaining": 1,
-        "player0hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-        "player0desired": 4,
-        "player0taken": 0,
-
-        "player1desired": 4,
-        "player1taken": 0,
-
-        "player2desired": 4,
-        "player2taken": 0,
-
-        "player3desired": 4,
-        "player3taken": 0,
-
-        "wild_suit": 1
-    }
-
-    assert obs_to_string(obs) == "Cards Played: [Nine of Spades, Seven of Clubs]\nWildsuit: Clubs\nHand: [Six of Diamonds, Ten of Spades, Jack of Clubs, Joker (Highs) of Clubs, Joker (Highs) of Diamonds, Ten of Clubs, Seven of Clubs, Eight of Spades, Jack of Diamonds]\nDesired: 4\nTaken: 0\nOpponent 1 Desired: 4\nOpponent 1 Taken: 0\nOpponent 2 Desired: 4\nOpponent 2 Taken: 0\nOpponent 3 Desired: 4\nOpponent 3 Taken: 0\nJokers Remaining: 1\n"
-    
-
-def test_cards_in_hand():
-    obs = {
-        "player0hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-        "desired": 4,
-        "taken": 0
-    }
-    assert cards_in_hand(obs) == 9
-
-def test_int_to_suit():
-    assert int_to_suit(0) == "Diamonds"
-    assert int_to_suit(1) == "Clubs"
-    assert int_to_suit(2) == "Hearts"
-    assert int_to_suit(3) == "Spades"
-    assert int_to_suit(4) == "No Wild Suit"
-
-def test_filter_by_suit_with_joks():
-    cards = [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
-    filtered = filter_by_suit_with_joks(cards, 1)
-    assert filtered == [Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1)]
-
-def test_first_suit_exists():
-    obs = {
-        "in_play": [46, 46, 46],
-    }
-    assert not first_suit_exists(obs)
-
-    obs = {
-        "in_play": [1, 46, 46],
-    }
-    assert first_suit_exists(obs)
-
-    obs = {
-        "in_play": [1, 2, 46],
-    }
-    assert first_suit_exists(obs)
-
-def test_first_suit_index():
-    obs = {
-        "in_play": [46, 46, 46],
-    }
-    assert not first_suit_index(obs)
-
-    obs = {
-        "in_play": [1, 46, 46],
-    }
-    assert first_suit_index(obs) == 2
-
-    obs = {
-        "in_play": [1, 2, 46],
-    }
-    assert first_suit_index(obs) == 2
-
-    obs = {
-        "in_play": [3, 2, 3],
-    }
-
-    assert first_suit_index(obs) == 1
-
-def test_playable():
-    obs = {
-        "in_play": [46, 46, 46],
-        "jokers_remaining": 2,
-        "player0hand": map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-                ),
-        "player0desired": 4,
-        "player0taken": 0,
-        "wild_suit": 1
-    }
-
-    assert playable(obs) == [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)]
-
-    obs = {
-        "in_play": [1, 46, 46],
-        "jokers_remaining": 2,
-        "player0hand": list(map(
-                    lambda x: card_to_int(x),
-                    list([Card(6, 0), Card(10, 2), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 2), Card(11, 0)])
-                )),
-        "player0desired": 4,
-        "player0taken": 0,
-        "wild_suit": 2
-    }
-
-    cur_playable = playable(obs)
-    assert cur_playable == [Card(10, 2), Card(15, 1), Card(15, 0), Card(8, 2)]
-
-def test_contains_suit():
-    assert contains_suit(1, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-    assert not contains_suit(2, [Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)])
-
-def test_highest_of_suit():
-    assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)], 1).is_joker()
-    assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(15, 1), Card(15, 0), Card(10, 1), Card(7, 1), Card(8, 3), Card(11, 0)], 2) == None
-    assert highest_of_suit([Card(6, 0), Card(10, 3), Card(11, 1), Card(7, 1), Card(15, 0), Card(10, 1), Card(7, 2), Card(8, 3), Card(11, 0)], 1) == Card(11, 1)
-
-def test_contains_transformed_joker():
-    cards = [
-        Card(6, 0),
-        Card(10, 3),
-        Card(11, 1),
-        Card(15, 1),
-    ]
-    assert get_transformed_joker(cards) == None
-
-    cards = [
-        Card(6, 0),
-        Card(10, 3),
-        Card(11, 1),
-        Card(6, 0),
-    ]
-    assert get_transformed_joker(cards)
-
+@pytest.mark.parametrize("action", [-1, 44, 45, 1.5])
+def test_invalid_consumption_never_removes_a_card(action):
+    hand = [Card(16, 0), Card(7, 0)]
+    before = list(hand)
+    with pytest.raises(ValueError):
+        consume_card(hand, action)
+    assert hand == before

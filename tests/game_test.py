@@ -1,398 +1,188 @@
 import random
-from src.player import Player
-from src.game import Game
-from src.card import Card
 
-from agents.random_caller_random_player import RandomCallerRandomPlayer
-from src.utils import int_to_card, card_to_int
+import numpy as np
+import pytest
 
-def test_init():
-    game = Game()
-    assert game is not None
-    assert game.players[0].number == 0 and game.players[1].number == 1 and game.players[2].number == 2 and game.players[3].number == 3
-    assert game.players[0].hand is not None and game.players[1].hand is not None and game.players[2].hand is not None and game.players[3].hand is not None
+from jokerai.agents import RandomCallerRandomPlayer, RuleBasedAgent
+from jokerai.card import Card
+from jokerai.game import Game
 
-def test_reset_vars():
-    # The following test makes sure that reset_vars() 
-    # resets deck, players, round, play, dealer, wild_suit, jokers_remaining, in_play
 
-    game = Game([Player(0), Player(1), Player(2), Player(3)])
-    game.reset_vars()
-    assert game is not None
-    assert game.players[0].hand is not None and game.players[1].hand is not None and game.players[2].hand is not None and game.players[3].hand is not None
-    assert game.round == 1
-    assert game.play == 1
-    assert game.dealer == (game.first_to_play - 1) % 4
+def test_independent_games_and_caller_owned_players():
+    players = [RandomCallerRandomPlayer(i) for i in range(4)]
+    a, b = Game(players), Game()
+    a.reset(seed=3)
+    assert all(not p.hand for p in players)
+    assert all(not p.hand for p in b.players)
+    a.players[0].score = 123
+    a.reset(seed=3)
+    assert all(p.score == 0 for p in a.players)
 
-def test_get_num_to_deal(): # add more tests
+
+@pytest.mark.parametrize("leader", range(4))
+def test_all_seats_play_exactly_once_after_seat_zero(leader):
     game = Game(only_nines=True)
-    game.reset_vars()
-    assert game.get_num_to_deal() == 9
+    game.reset_vars(seed=1)
+    game.deal()
+    game.get_calls()
+    game.first_to_play = leader
+    game.started = True
+    game.post_plays()
+    assert len(game.in_play) == (4 - leader) % 4
+    before = sum(len(p.hand) for p in game.players)
+    game.step(game.legal_actions()[0])
+    assert len(game.tricks[0]["cards"]) == 4
+    assert sum(p.taken for p in game.players) == 1
+    assert len(game.players[0].hand) == 8
+    assert sum(len(p.hand) for p in game.players) <= before - 1
 
-    game = Game() 
-    game.reset_vars()
-    assert game.get_num_to_deal() == 1
 
+@pytest.mark.parametrize("only_nines", [False, True])
+@pytest.mark.parametrize("agent_type", [RandomCallerRandomPlayer, RuleBasedAgent])
+def test_fifty_complete_games_conserve_cards_tricks_and_scores(only_nines, agent_type):
+    for seed in range(50):
+        game = Game([agent_type(i) for i in range(4)], only_nines=only_nines)
+        game.reset(seed=seed)
+        steps = 0
+        while not game.done:
+            hand_before = tuple(game.players[0].hand)
+            action = game.players[0].choose_action(game.to_obs())
+            assert tuple(game.players[0].hand) == hand_before, "agents must not remove cards"
+            assert action in game.legal_actions()
+            game.step(action)
+            steps += 1
+            assert steps <= 144
+        assert steps == 144
+        schedule = [n for section in game.deal_amounts for n in section]
+        assert [h["dealt"] for h in game.history] == schedule
+        expected_scores = [0] * 4
+        previous_dealer = None
+        for hand in game.history:
+            n = hand["dealt"]
+            assert len(hand["tricks"]) == n
+            assert sum(hand["taken"]) == n
+            assert sum(hand["bids"]) != n
+            if previous_dealer is not None:
+                assert hand["dealer"] == (previous_dealer + 1) % 4
+            previous_dealer = hand["dealer"]
+            assert hand["tricks"][0]["leader"] == (hand["dealer"] + 1) % 4
+            for prev, current in zip(hand["tricks"], hand["tricks"][1:]):
+                assert current["leader"] == prev["winner"]
+            cards = [c for trick in hand["tricks"] for c in trick["cards"]]
+            assert len(cards) == 4 * n
+            ordinary = [c for c in cards if not c.is_joker()]
+            assert len(set(ordinary)) == len(ordinary)
+            assert sum(c.is_joker() for c in cards) <= 2
+            for i, (bid, taken) in enumerate(zip(hand["bids"], hand["taken"])):
+                points = (
+                    -200
+                    if taken == 0 and bid > 0
+                    else (
+                        taken * 100
+                        if taken == bid == n
+                        else taken * 50 + 50
+                        if bid == taken
+                        else taken * 10
+                    )
+                )
+                expected_scores[i] += points
+            assert hand["scores"] == expected_scores
+        assert [p.score for p in game.players] == expected_scores
+        assert all(not p.hand for p in game.players)
+        assert game.legal_actions() == []
+        assert game.get_num_to_deal() == 0
+        with pytest.raises(RuntimeError):
+            game.step(0)
+
+
+@pytest.mark.parametrize("dealer", range(4))
+def test_bidding_uses_seat_order_and_forbids_dealer_complement(dealer):
     game = Game()
-    game.reset_vars()
+    game.reset_vars(seed=2)
+    game.dealer = dealer
+    game.deal()
+    order = []
+    for player in game.players:
+        original = player.call
+
+        def call(obs, player=player, original=original):
+            order.append(player.number)
+            return original(obs)
+
+        player.call = call
+    bids = game.get_calls()
+    assert order == [(dealer + offset) % 4 for offset in range(1, 5)]
+    assert all(0 <= bid <= 1 for bid in bids)
+    assert sum(bids) != 1
+
+
+def test_trump_clears_in_nine_card_deal_and_jokers_are_never_trump():
+    game = Game()
+    game.reset_vars(seed=4)
+    game.wild_suit = 2
     game.round = 2
-    assert game.get_num_to_deal() == 9
-
-    game = Game()
-    game.reset_vars()
-    game.round = 3
-    assert game.get_num_to_deal() == 8
-
-    game = Game()
-    game.reset_vars()
-    game.round = 4
-    assert game.get_num_to_deal() == 9
-
-    game = Game()
-    game.reset_vars()
-    game.round = 1
-    game.play = 5
-    assert game.get_num_to_deal() == 5
-
-    game = Game()
-    game.reset_vars()
-    game.round = 1
-    game.play = 8
-    assert game.get_num_to_deal() == 8
-
-    game = Game()
-    game.reset_vars()
-    game.round = 3
-    game.play = 8
-    assert game.get_num_to_deal() == 1
-
-    game = Game()
-    game.reset_vars()
-    game.round = 3
-    game.play = 2
-    assert game.get_num_to_deal() == 7
-
-    game = Game(only_nines=True)
-    game.reset_vars()
-    for round in range(1, 5):
-        for play in range(1, 5):
-            assert game.get_num_to_deal() == 9
-
-def test_get_calls():
-    # This function tests the get_calls() function in game.py to assure that it sets the calls of each player to a valid int corresponding to
-    # the type of agent
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-    game.reset_vars()
-    game.get_calls()
-    for player_num in range(game.first_to_play, game.first_to_play + 4):
-        game.deck.deal(game.players[player_num % 4].hand, times = game.get_num_to_deal()) # player num needs to be modded to get the correct players
-    calls = game.get_calls()
-
-    assert calls[0] >= 0 and calls[0] <=1
-    assert calls[1] >= 0 and calls[1] <=1
-    assert calls[2] >= 0 and calls[2] <=1
-    assert calls[3] >= 0 and calls[3] <=1
-
-def test_deal():
-    # This function tests the deal() function in game.py to assure that it deals the correct number of cards to each player
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-    game.reset_vars()
-    game.get_calls()
     game.deal()
-
-    assert len(game.players[0].hand) == 1
-    assert len(game.players[1].hand) == 1
-    assert len(game.players[2].hand) == 1
-    assert len(game.players[3].hand) == 1
-    
-    assert game.players[0].hand[0] != game.players[1].hand[0] and game.players[0].hand[0] != game.players[2].hand[0] and game.players[0].hand[0] != game.players[3].hand[0]
-
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
-    game.reset_vars()
-    game.get_calls()
-    game.deal()
-
-    assert len(game.players[0].hand) == 9
-    assert len(game.players[1].hand) == 9
-    assert len(game.players[2].hand) == 9
-    assert len(game.players[3].hand) == 9
-
-    assert game.players[0].hand[0] != game.players[1].hand[0] and game.players[0].hand[0] != game.players[2].hand[0] and game.players[0].hand[0] != game.players[3].hand[0]
-
-def test_reset_play():
-    # This function tests the reset_play() function in game.py to assure that it resets the played variable to an
-    #  empty list and resets the first suit
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-    game.reset()
-    game.player_0_play(1, first=game.first_to_play == 0)
-        
-    game.pre_plays()
-
-    if game.is_done():
-        return
-            
-    game.reset_play()
-
-    assert game.in_play == []
-    assert game.first_suit == 4
-
-# def test_add_play():
-#     # This function tests the add_play() function in game.py to assure that it adds the correct card to the in_play list
-#     game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-#     game.reset_vars()
-#     game.deal()
-#     game.first_to_play = 0
-#     choice = random.choice(game.players[0].hand)
-#     game.add_play(card_to_int(choice), first=True)
-#     assert choice in game.in_play
-#     assert game.first_suit == choice.suit
-
-def test_is_done():
-    # This function tests the is_done() function in game.py to assure that it returns True when the game is done and False when it is not
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
-    game.reset_vars()
-    game.deal()
-    game.step(1)
-    assert game.is_done() == False
-
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=True)
-    game.reset_vars()
-    game.play = 4
-    game.round = 4
-    game.update_play()
-    assert game.is_done() == True
-
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)], only_nines=False)
-    game.reset_vars()
-    game.play = 8
-    game.round = 3
-    game.update_play()
-    assert game.is_done() == False
-
-    game.round = 4
-    game.play = 4
-    game.update_play()
-    assert game.is_done() == True
-
-def test_winner():
-    game = Game()
-    game.first_suit = 3
-    game.wild_suit = 0
-    
-    assert game.winner([Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]) == 1
-    assert game.winner([Card(6, 3), Card(7, 3), Card(6, 2), Card(9, 1)]) == 1
-    assert game.winner([Card(6, 3), Card(7, 3), Card(6, 0), Card(9, 2)]) == 2
-    assert game.winner([Card(6, 0), Card(7, 0), Card(16, 1), Card(16, 0)]) == 3
-    assert game.winner([Card(12, 3), Card(7, 1), Card(16, 2), Card(9, 1)]) == 2
-    
-    assert game.winner([Card(15, 3), Card(16, 1), Card(16, 2), Card(9, 0)]) == 2
-    assert game.winner([Card(5, 3), Card(6, 3), Card(12, 2), Card(9, 0)]) == 3
-    assert game.winner([Card(15, 3), Card(16, 1), Card(12, 2), Card(9, 0)]) == 1
-
-def test_update_takes():
-    game = Game()
-    game.reset_vars()
-    game.first_suit = 3
-    game.wild_suit = 0
-    game.first_to_play = 0
-
-    game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
-    game.update_take()
-
-    assert game.players[1].taken == 1
-
-def test_process_hand_results():
-    game = Game()
-    game.reset_vars()
-    game.first_suit = 3
-    game.wild_suit = 0
-    game.first_to_play = 0
-    game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
-    game.process_hand_results()
-
-    assert game.players[1].taken == 1
-    assert game.in_play == []
-    assert game.first_suit == 4
-
-def test_get_calls():
-    game = Game()
-    game.reset_vars()
-    for player_num in range(game.first_to_play, game.first_to_play + 4):
-        cards_per_player = game.get_num_to_deal()
-        game.deck.deal(game.players[player_num % 4].hand, times = cards_per_player) # player num needs to be modded to get the correct players
-        
-    game.get_calls()
-
-    assert game.players[0].taken >= 0 and game.players[0].taken <= 1
-    assert game.players[1].taken >= 0 and game.players[1].taken <= 1
-    assert game.players[2].taken >= 0 and game.players[2].taken <= 1
-    assert game.players[3].taken >= 0 and game.players[3].taken <= 1
-
-def test_get_num_to_deal():
-    game = Game(only_nines=False)
-    game.reset_vars()
-    assert game.get_num_to_deal() == 1
-
-    game = Game(only_nines=True)
-    game.reset_vars()
-    assert game.get_num_to_deal() == 9
-
-def test_game_reset():
-    game = Game([RandomCallerRandomPlayer(0), RandomCallerRandomPlayer(1), RandomCallerRandomPlayer(2), RandomCallerRandomPlayer(3)])
-    game.deck.pop(0)
-    game.in_play = [Card(6, 3), Card(7, 3), Card(6, 2), Card(7, 2)]
-    game.round = 12
-    game.play = 12
-    game.first_to_play = 12
-    game.first_suit = 11
-
-    game.reset()
-
-    assert len(game.deck) == 32
-    assert isinstance(len(game.in_play), int) and len(game.in_play) >= 0 and len(game.in_play) <= 3
-    assert game.round == 1
-    assert game.play == 1
-    assert game.first_to_play >= 0 and game.first_to_play <= 3
-    assert game.first_to_play == 0 or game.first_suit == game.in_play[0].suit
-
-def test_game_reset_vars():
-    game = Game()
-    game.reset_vars()
-    assert game.round == 1
-    assert game.play == 1
-    assert game.first_to_play >= 0 and game.first_to_play <= 3
-    assert game.first_suit == 4
-
-def test_reset_and_one_step():
-    random.seed(1)
-    game = Game()
-    game.reset()
-    first = game.first_to_play
-    if first == 0:
-        assert game.first_suit == 4
+    assert game.wild_suit == 4
+    assert game.jokers_remaining == 2
+    for seed in range(100):
+        game.reset(seed=seed)
+        if game.wild_card.is_joker():
+            assert game.wild_suit == 4
+            break
     else:
-        assert game.first_suit == game.in_play[0].suit
+        pytest.fail("fixture did not produce a turned-up Joker")
 
-    assert game.play == 1
-    assert game.round == 1
-    assert [card not in game.in_play for card in game.players[0].hand].count(True) == game.get_num_to_deal()
-    assert all([len(player.hand) >= 0 and len(player.hand) <= 1 for player in game.players[1:4]])
 
-    dealer = game.dealer
-
-    game.step(card_to_int(game.players[0].play(game.to_obs())))
-
-    assert game.play == 2
-    assert game.round == 1
-    assert game.dealer == (dealer + 1) % 4
-    dealer = game.dealer
-
-    assert sum([player.taken for player in game.players]) == 0
-    assert not all([not player.score for player in game.players])
-
-def test_one_game():
+@pytest.mark.parametrize("action", [-1, 44, 1.5, True, "1"])
+def test_bad_actions_do_not_mutate_engine(action):
     game = Game()
-    game.reset()
-    # game.print_game()
-    while not game.is_done():
-        game.step(card_to_int(game.players[0].play(game.to_obs())))
-        # game.print_game()
+    game.reset(seed=2)
+    before = repr(game.to_obs()), game.rng.getstate(), tuple(game.players[0].hand)
+    with pytest.raises(ValueError):
+        game.step(action)
+    assert before == (repr(game.to_obs()), game.rng.getstate(), tuple(game.players[0].hand))
 
-def test_100_games():
-    random.seed(3)
-    for i in range(100):
-        game = Game()
-        game.reset()
-        # # game.print_game()
-        while not game.is_done():
-            game.step(card_to_int(game.players[0].play(game.to_obs())))
-        #     # game.print_game()
-    
-# def test_1000_games():
-#     random.seed(3)
-#     for i in range(1000):
-#         game = Game()
-#         game.reset()
-#         # # game.print_game()
-#         while not game.is_done():
-#             game.step(card_to_int(game.players[0].play(game.to_obs())))
-#         #     # game.print_game()
 
-def test_second_card_wins():
+def test_out_of_turn_unavailable_action_does_not_mutate_engine():
     game = Game()
+    game.reset(seed=4)
+    action = next(a for a in range(44) if a not in game.legal_actions())
+    before = repr(game.to_obs())
+    with pytest.raises(ValueError):
+        game.step(action)
+    assert repr(game.to_obs()) == before
 
-    for i in range(50):
-        
-        game.in_play = [Card(6, 1), # Transformed Joker
-                        Card(7, 3), 
-                        Card(6, 3), 
-                        Card(7, 2)]
-        assert game.winner(game.in_play) == 0
-        
-        game.in_play = [Card(6, 1), # Joker
-                        Card(7, 1), 
-                        Card(6, 3), 
-                        Card(7, 2)]
-        assert game.winner(game.in_play) == 1
-        
-        game.in_play = [Card(6, 0), # Transformed Joker
-                        Card(7, 3), 
-                        Card(6, 0), # Non-Joker 6 
-                        Card(7, 2)]
-        assert game.winner(game.in_play) == 0
-        
-        game.in_play = [Card(6, 0), # Transformed Joker
-                        Card(7, 3), 
-                        Card(6, 0), # Non-Joker 6
-                        Card(16, 2)] # Joker
-        assert game.winner(game.in_play) == 3
 
-        game.in_play = [Card(6, 1), # Transformed Joker
-                        Card(7, 1), 
-                        Card(6, 0), 
-                        Card(16, 2)] # Joker
-        assert game.winner(game.in_play) == 3
-
-        game.in_play = [Card(15, 2), # Joker
-                        Card(7, 1), 
-                        Card(6, 0), 
-                        Card(16, 2)] # Joker
-        assert game.winner(game.in_play) == 3
-
-        game.in_play = [Card(15, 2), # Joker
-                        Card(7, 1), 
-                        Card(6, 0), 
-                        Card(14, 1)]
-        assert game.winner(game.in_play) == 0
-
-        game.in_play = [Card(6, 3), 
-                        Card(7, 1),
-                        Card(6, 0),
-                        Card(14, 1)]
-        assert game.winner(game.in_play) == 0
-
-        game.in_play = [Card(6, 3), 
-                        Card(7, 1),
-                        Card(6, 0),
-                        Card(7, 3)]
-        if game.wild_suit == 0:
-            assert game.winner(game.in_play) == 0
-        elif game.wild_suit == 1:
-            assert game.winner(game.in_play) == 1
-        else:
-            assert game.winner(game.in_play) == 3
-
-        game.in_play = [Card(6, 0),
-                        Card(6, 1),
-                        Card(6, 0),
-                        Card(6, 2)]
-
-        assert game.winner(game.in_play) == 0
-
-def test_game_until_done():
+def test_two_jokers_consume_one_physical_card_per_declaration():
     game = Game()
-    game.reset()
-    while not game.done:
-        game.step(card_to_int(game.players[0].play(game.to_obs())))
-    assert game.is_done()
-    
+    game.reset_vars(seed=2)
+    game.players[0].hand = [Card(16, 0), Card(16, 1)]
+    game.jokers_remaining = 2
+    game._play_action(0, 40)
+    assert len(game.players[0].hand) == 1
+    assert game.jokers_remaining == 1
+    game._play_action(0, 34)
+    assert game.players[0].hand == []
+    assert game.jokers_remaining == 0
+
+
+def test_global_random_state_is_untouched_and_seeded_games_match():
+    random.seed(11)
+    before = random.getstate()
+    a, b = Game(), Game()
+    a.reset(seed=17)
+    b.reset(seed=17)
+    for _ in range(144):
+        for key in a.to_obs():
+            np.testing.assert_equal(a.to_obs()[key], b.to_obs()[key])
+        action = a.legal_actions()[0]
+        a.step(action)
+        b.step(action)
+    assert random.getstate() == before
+
+
+def test_reset_required_and_seat_validation():
+    with pytest.raises(RuntimeError):
+        Game().step(0)
+    with pytest.raises(ValueError):
+        Game([RandomCallerRandomPlayer(0)] * 4)

@@ -1,17 +1,36 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [project]
 name = "jokerai"
-version = "0.0.1"
-authors = [
-  { name="Konstantine Kahadze", email="konstantinekahadze@gmail.com" },
-]
-description = "A Joker framework"
+version = "0.1.0"
+description = "A seeded Joker card-game engine and Gymnasium environment"
 readme = "README.md"
-requires-python = ">=3.8"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
+requires-python = ">=3.10"
+authors = [{ name = "Konstantine Kahadze", email = "konstantinekahadze@gmail.com" }]
+dependencies = ["gymnasium>=1.0,<2", "numpy>=1.24,<3"]
+classifiers = ["Programming Language :: Python :: 3", "Operating System :: OS Independent"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "build>=1.2,<2", "ruff>=0.14,<1"]
+
+[project.scripts]
+jokerai = "jokerai.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jokerai"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/jokerai", "/tests", "/examples", "/docs", "/README.md", "/pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

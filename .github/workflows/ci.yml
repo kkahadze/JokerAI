@@ -1,0 +1,35 @@
+name: Test and package
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e '.[dev]'
+      - run: ruff check src tests examples
+      - run: ruff format --check src tests examples
+      - run: python -m pytest -W error
+      - run: python -m build
+      - name: Test wheel installation outside checkout
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/jokerai-wheel"
+          "$RUNNER_TEMP/jokerai-wheel/bin/python" -m pip install dist/*.whl
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/jokerai-wheel/bin/python" -c 'from jokerai import JokerEnv; from gymnasium.utils.env_checker import check_env; check_env(JokerEnv(), skip_render_check=True)'
+          "$RUNNER_TEMP/jokerai-wheel/bin/jokerai" --games 2 --seed 42
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions-python-${{ matrix.python }}
+          path: dist/
